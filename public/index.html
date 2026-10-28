@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tokyo Family Trip 2026 — iOS Itinerary & Budget Planner</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ios: {
+              bg: '#F2F2F7',
+              card: '#FFFFFF',
+              blue: '#007AFF',
+              indigo: '#5856D6',
+              green: '#34C759',
+              orange: '#FF9500',
+              red: '#FF3B30',
+              teal: '#30B0C7',
+              gray: '#8E8E93',
+              separator: '#E5E5EA'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"Inter"', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .ios-blur {
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+
+    .ios-dark-blur {
+      background: rgba(24, 24, 27, 0.82);
+      backdrop-filter: saturate(180%) blur(18px);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+    }
+
+    .sheet-enter {
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .sheet-enter.sheet-active {
+      transform: translateY(0%);
+    }
+
+    .ios-press:active {
+      transform: scale(0.96);
+    }
+
+    @keyframes islandPulse {
+      0%, 100% { transform: scaleX(1); }
+      50% { transform: scaleX(1.03); }
+    }
+    .island-animate:hover {
+      animation: islandPulse 1.5s infinite ease-in-out;
+    }
+
+    .check-pop {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 min-h-screen flex flex-col items-center justify-center sm:py-6 sm:px-4 overflow-x-hidden">
+
+  <!-- Desktop Ambient Header & Helper Bar -->
+  <div class="hidden sm:flex items-center justify-between w-full max-w-[405px] mb-3 px-2 text-slate-300 text-xs">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="font-medium tracking-wide text-slate-200">iPhone 16 Pro • Japan Travel.xlsx Synced</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="resetToExcelData()" class="hover:text-white transition underline decoration-slate-600 underline-offset-4 cursor-pointer">
+        Restore Excel Defaults
+      </button>
+    </div>
+  </div>
+
+  <!-- iPhone 16 Pro Frame Container -->
+  <div class="relative w-full h-screen sm:w-[402px] sm:h-[854px] bg-[#F2F2F7] sm:rounded-[56px] sm:border-[11px] sm:border-[#27272A] sm:shadow-[0_25px_70px_-10px_rgba(0,0,0,0.85),0_0_0_2px_rgba(255,255,255,0.12)] overflow-hidden flex flex-col">
+
+    <!-- Hardware Side Buttons (Desktop Decoration) -->
+    <div class="hidden sm:block absolute -left-[14px] top-28 w-[3px] h-8 bg-zinc-700 rounded-l"></div>
+    <div class="hidden sm:block absolute -left-[14px] top-40 w-[3px] h-14 bg-zinc-700 rounded-l"></div>
+    <div class="hidden sm:block absolute -left-[14px] top-56 w-[3px] h-14 bg-zinc-700 rounded-l"></div>
+    <div class="hidden sm:block absolute -right-[14px] top-44 w-[3px] h-20 bg-zinc-700 rounded-r"></div>
+
+    <!-- iOS Status Bar + Dynamic Island -->
+    <header class="relative z-40 pt-2.5 pb-2 px-7 flex items-center justify-between text-xs font-semibold text-zinc-900 select-none shrink-0 bg-[#F2F2F7]/90 backdrop-blur-md">
+      <span id="iosClock" class="tracking-tight text-[14px] font-bold w-14">9:41</span>
+
+      <!-- Dynamic Island -->
+      <div onclick="triggerIslandToast()" title="Tap for flight & trip status" class="island-animate cursor-pointer bg-black text-white h-[30px] px-3.5 rounded-full flex items-center justify-between gap-2.5 shadow-md transition-all duration-300">
+        <div class="flex items-center gap-1.5">
+          <i class="fa-solid fa-plane-departure text-[10px] text-sky-400"></i>
+          <span id="islandBadge" class="text-[10px] font-medium tracking-tight text-zinc-200">ICN→NRT • YP731</span>
+        </div>
+        <div class="w-2.5 h-2.5 rounded-full bg-[#18181b] border border-zinc-700 flex items-center justify-center">
+          <div class="w-1 h-1 rounded-full bg-emerald-400"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-1.5 w-14 text-[12px]">
+        <i class="fa-solid fa-signal"></i>
+        <i class="fa-solid fa-wifi"></i>
+        <i class="fa-solid fa-battery-full text-[14px]"></i>
+      </div>
+    </header>
+
+    <!-- Dynamic Island Toast Notification -->
+    <div id="islandToast" class="pointer-events-none absolute top-14 inset-x-4 z-50 transition-all duration-300 opacity-0 -translate-y-3">
+      <div class="ios-dark-blur text-white px-4 py-3 rounded-2xl shadow-xl border border-white/10 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-torii-gate text-sm"></i>
+          </div>
+          <div>
+            <p id="toastTitle" class="font-semibold text-white">Japan Travel Synced</p>
+            <p id="toastSub" class="text-zinc-300 text-[11px]">Oct 31 – Nov 8, 2026 • Sumida City</p>
+          </div>
+        </div>
+        <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-zinc-300">Now</span>
+      </div>
+    </div>
+
+    <!-- MAIN SCROLLABLE VIEWPORT -->
+    <main id="appViewport" class="flex-1 overflow-y-auto no-scrollbar pb-28">
+
+      <!-- ================= TAB 1: OVERVIEW (LOGISTICS, FLIGHTS, AIRBNB, NEARBY) ================= -->
+      <section id="tab-overview" class="px-4 pt-1 space-y-4">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-ios-gray">Family Travel Hub</p>
+            <h1 class="text-[25px] font-bold tracking-tight text-zinc-900 leading-tight">Tokyo Autumn 2026</h1>
+          </div>
+          <span class="bg-red-50 text-ios-red border border-red-200/70 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+            <span>🇯🇵</span> 9 Days / 8 Nights
+          </span>
+        </div>
+
+        <!-- Hero Card -->
+        <div class="relative rounded-3xl overflow-hidden shadow-lg text-white bg-zinc-900">
+          <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=900&q=80" alt="Tokyo Skytree & City" class="w-full h-52 object-cover opacity-80" onerror="this.src='https://placehold.co/800x450/1e293b/ffffff?text=Tokyo+2026'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/15"></div>
+
+          <div class="absolute top-3.5 inset-x-3.5 flex items-center justify-between">
+            <span class="ios-dark-blur text-[11px] font-semibold px-3 py-1 rounded-full border border-white/15 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>Oct 31 (Sat) – Nov 8 (Sun), 2026</span>
+            </span>
+            <span class="ios-dark-blur text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/15">
+              2 Adults • 2 Kids (incl. CJ)
+            </span>
+          </div>
+
+          <div class="absolute bottom-3.5 inset-x-4">
+            <div class="flex items-center gap-1.5 text-amber-300 text-xs font-semibold mb-0.5">
+              <i class="fa-solid fa-location-dot"></i>
+              <span>Sumida City, Tokyo • Kamakura • Mt. Fuji • Yokohama</span>
+            </div>
+            <h2 class="text-xl font-bold tracking-tight leading-snug">Tokyo Family Adventure & Disney</h2>
+            <div class="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-white/15 text-[11px]">
+              <div>
+                <p class="text-zinc-400 text-[10px]">Paid (KRW)</p>
+                <p id="heroKrwPaid" class="font-bold text-white">₩2,462,000</p>
+              </div>
+              <div>
+                <p class="text-zinc-400 text-[10px]">Paid (PHP)</p>
+                <p id="heroPhpPaid" class="font-bold text-emerald-300">₱104,747.77</p>
+              </div>
+              <div>
+                <p class="text-zinc-400 text-[10px]">Food Budget</p>
+                <p id="heroJpyBudget" class="font-bold text-amber-300">JP¥150,000</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Navigation Pills -->
+        <div class="grid grid-cols-3 gap-2.5">
+          <div onclick="switchTab('itinerary')" class="ios-press cursor-pointer bg-white p-3 rounded-2xl shadow-xs border border-zinc-100 flex flex-col justify-between">
+            <div class="w-8 h-8 rounded-xl bg-blue-50 text-ios-blue flex items-center justify-center">
+              <i class="fa-solid fa-calendar-days text-sm"></i>
+            </div>
+            <div class="mt-2">
+              <p id="statTotalActs" class="text-lg font-extrabold text-zinc-900">52</p>
+              <p class="text-[11px] font-medium text-ios-gray">9-Day Schedule</p>
+            </div>
+          </div>
+
+          <div onclick="switchTab('budget')" class="ios-press cursor-pointer bg-white p-3 rounded-2xl shadow-xs border border-zinc-100 flex flex-col justify-between">
+            <div class="w-8 h-8 rounded-xl bg-amber-50 text-ios-orange flex items-center justify-center">
+              <i class="fa-solid fa-coins text-sm"></i>
+            </div>
+            <div class="mt-2">
+              <p class="text-lg font-extrabold text-zinc-900">14 Items</p>
+              <p class="text-[11px] font-medium text-ios-gray">₩ / ₱ / ¥ Ledger</p>
+            </div>
+          </div>
+
+          <div onclick="switchTab('checklists')" class="ios-press cursor-pointer bg-white p-3 rounded-2xl shadow-xs border border-zinc-100 flex flex-col justify-between">
+            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-ios-green flex items-center justify-center">
+              <i class="fa-solid fa-utensils text-sm"></i>
+            </div>
+            <div class="mt-2">
+              <p id="statFoodChecklist" class="text-lg font-extrabold text-zinc-900">12 Spots</p>
+              <p class="text-[11px] font-medium text-ios-gray">Food & Checklists</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FLIGHT DETAILS CARD (Sheet2 Rows 1-3) -->
+        <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-sky-50 text-ios-blue flex items-center justify-center">
+                <i class="fa-solid fa-plane text-sm"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-zinc-900">Flight Schedule (Air Premia)</h3>
+                <p class="text-[11px] text-ios-gray">Incheon (ICN) ↔ Narita (NRT)</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold bg-sky-50 text-sky-700 px-2.5 py-1 rounded-full border border-sky-200">
+              Paid ₩1,440,000
+            </span>
+          </div>
+
+          <!-- Outbound Flight -->
+          <div class="bg-zinc-50 rounded-2xl p-3 border border-zinc-200/70 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white px-2 py-0.5 rounded-md">Outbound • Oct 31, 2026 (Sat)</span>
+              <span class="text-xs font-extrabold text-zinc-800">B787-9-YP731</span>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <div>
+                <p class="text-lg font-black text-zinc-900 leading-none">08:45</p>
+                <p class="text-[11px] font-semibold text-zinc-600 mt-1">Incheon T1</p>
+              </div>
+              <div class="flex-1 px-3 text-center">
+                <p class="text-[10px] font-bold text-ios-blue">2h 45m</p>
+                <div class="flex items-center gap-1 my-0.5">
+                  <div class="h-[1.5px] flex-1 bg-zinc-300"></div>
+                  <i class="fa-solid fa-plane text-[10px] text-ios-blue"></i>
+                  <div class="h-[1.5px] flex-1 bg-zinc-300"></div>
+                </div>
+                <p class="text-[10px] text-zinc-500">Direct</p>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-black text-zinc-900 leading-none">11:20</p>
+                <p class="text-[11px] font-semibold text-zinc-600 mt-1">Narita T2</p>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-zinc-200/70 flex flex-wrap items-center justify-between gap-1 text-[11px] text-zinc-600">
+              <span><i class="fa-regular fa-clock text-ios-orange mr-1"></i><strong>Check-in Counter:</strong> 5:45 – 7:45</span>
+              <span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-md">Bus 3300 @ 05:30</span>
+            </div>
+          </div>
+
+          <!-- Inbound Flight -->
+          <div class="bg-zinc-50 rounded-2xl p-3 border border-zinc-200/70 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-indigo-600 text-white px-2 py-0.5 rounded-md">Return • Nov 8, 2026 (Sun)</span>
+              <span class="text-xs font-extrabold text-zinc-800">B787-9-YP732</span>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <div>
+                <p class="text-lg font-black text-zinc-900 leading-none">12:30</p>
+                <p class="text-[11px] font-semibold text-zinc-600 mt-1">Narita T2</p>
+              </div>
+              <div class="flex-1 px-3 text-center">
+                <p class="text-[10px] font-bold text-indigo-600">2h 50m</p>
+                <div class="flex items-center gap-1 my-0.5">
+                  <div class="h-[1.5px] flex-1 bg-zinc-300"></div>
+                  <i class="fa-solid fa-plane text-[10px] text-indigo-600"></i>
+                  <div class="h-[1.5px] flex-1 bg-zinc-300"></div>
+                </div>
+                <p class="text-[10px] text-zinc-500">Direct</p>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-black text-zinc-900 leading-none">15:20</p>
+                <p class="text-[11px] font-semibold text-zinc-600 mt-1">Incheon T1</p>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-zinc-200/70 flex items-center justify-between text-[11px] text-zinc-600">
+              <span><i class="fa-regular fa-clock text-indigo-500 mr-1"></i><strong>Check-in Counter:</strong> 9:30 – 11:30</span>
+              <span class="text-zinc-500 font-medium">Narita Skyliner</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCOMMODATION CARD (Sheet2 Row 6) -->
+        <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                <i class="fa-brands fa-airbnb text-base"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-zinc-900">Airbnb — Home in Sumida</h3>
+                <p class="text-[11px] text-ios-gray">Oct. 31 – Nov. 8, 2026 (8 Nights)</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200">
+              ₱32,024.07 (BPI)
+            </span>
+          </div>
+
+          <div class="bg-zinc-50 p-3 rounded-xl border border-zinc-200/70 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <div class="text-xs text-zinc-800 font-semibold leading-snug">
+                <i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>
+                1-chōme-39-17 Yahiro Sumida City, Tokyo 131-0041
+              </div>
+              <button onclick="copyTextToClipboard('1-chōme-39-17 Yahiro Sumida City, Tokyo 131-0041', 'Airbnb Address Copied')" class="ios-press shrink-0 bg-white border border-zinc-200 px-2.5 py-1 rounded-lg text-[11px] font-bold text-ios-blue shadow-2xs">
+                <i class="fa-regular fa-copy mr-1"></i>Copy
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-zinc-200/60 text-xs">
+              <div class="bg-white p-2 rounded-lg border border-zinc-100">
+                <span class="text-[10px] uppercase font-bold text-ios-gray block">Check-In Time</span>
+                <span class="font-extrabold text-zinc-900">4:00 PM (16:00)</span>
+              </div>
+              <div class="bg-white p-2 rounded-lg border border-zinc-100">
+                <span class="text-[10px] uppercase font-bold text-ios-gray block">Check-Out Time</span>
+                <span class="font-extrabold text-zinc-900">10:00 AM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEARBY KONBINI & KEY SAVED SPOTS (Sheet2 Rows 63-68, 83-84) -->
+        <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-ios-gray">Nearby Konbini & Key Addresses</h3>
+            <span class="text-[11px] text-ios-blue font-semibold">Yahiro / Asakusa</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 border border-zinc-100">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-[11px]">L</span>
+                <div>
+                  <p class="font-bold text-zinc-900">Lawson</p>
+                  <p class="text-[11px] text-zinc-500">Yahiro 1-Chome Shop (Nearest to Airbnb)</p>
+                </div>
+              </div>
+              <button onclick="copyTextToClipboard('Lawson Yahiro 1-Chome Shop, Sumida City', 'Lawson Copied')" class="text-ios-blue text-[11px] font-semibold px-2 py-1">Copy</button>
+            </div>
+
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 border border-zinc-100">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[11px]">FM</span>
+                <div>
+                  <p class="font-bold text-zinc-900">Family Mart</p>
+                  <p class="text-[11px] text-zinc-500">Yahiro 6-Chome Shop</p>
+                </div>
+              </div>
+              <button onclick="copyTextToClipboard('FamilyMart Yahiro 6-Chome Shop, Sumida City', 'FamilyMart Copied')" class="text-ios-blue text-[11px] font-semibold px-2 py-1">Copy</button>
+            </div>
+
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 border border-zinc-100">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-bowl-rice text-xs"></i></span>
+                <div>
+                  <p class="font-bold text-zinc-900">Katsuya Asakusa</p>
+                  <p class="text-[11px] text-zinc-500">1-33-3 Asakusa • Katsudon (Day 4 Bfast)</p>
+                </div>
+              </div>
+              <button onclick="copyTextToClipboard('1-33-3 Asakusa, Taito City, Tokyo', 'Katsuya Address Copied')" class="text-ios-blue text-[11px] font-semibold px-2 py-1">Copy</button>
+            </div>
+
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 border border-zinc-100">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-red-100 text-red-700 flex items-center justify-center"><i class="fa-solid fa-bowl-food text-xs"></i></span>
+                <div>
+                  <p class="font-bold text-zinc-900">Ichiran Asakusa (Closes 10PM)</p>
+                  <p class="text-[11px] text-zinc-500">1 Chome-1-16 Asakusa • Pork Tonkotsu Ramen</p>
+                </div>
+              </div>
+              <button onclick="copyTextToClipboard('1 Chome-1-16 Asakusa, Taito City, Tokyo', 'Ichiran Address Copied')" class="text-ios-blue text-[11px] font-semibold px-2 py-1">Copy</button>
+            </div>
+
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 border border-zinc-100">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center"><i class="fa-solid fa-building-columns text-xs"></i></span>
+                <div>
+                  <p class="font-bold text-zinc-900">Tokyo Metropolitan Government Office</p>
+                  <p class="text-[11px] text-zinc-500">Shinjuku (Day 4 & Day 7 Viewpoint)</p>
+                </div>
+              </div>
+              <button onclick="copyTextToClipboard('Tokyo Metropolitan Government Building, Shinjuku', 'Copied')" class="text-ios-blue text-[11px] font-semibold px-2 py-1">Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= TAB 2: 9-DAY COMPLETE ITINERARY ================= -->
+      <section id="tab-itinerary" class="hidden px-4 pt-1 space-y-3.5">
+
+        <!-- Header & Add Activity CTA -->
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-ios-gray">Oct 31 – Nov 8, 2026</p>
+            <h1 class="text-[25px] font-bold tracking-tight text-zinc-900 leading-tight">9-Day Itinerary</h1>
+          </div>
+          <button onclick="openActivityModal()" class="ios-press bg-ios-blue text-white px-3.5 py-2 rounded-full text-xs font-semibold shadow-md shadow-blue-500/25 flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Stop</span>
+          </button>
+        </div>
+
+        <!-- Horizontal Day Pill Selector (Days 1 to 9) -->
+        <div class="sticky top-0 z-20 -mx-4 px-4 py-2 ios-blur border-b border-zinc-200/70">
+          <div id="dayPillsContainer" class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <!-- Dynamically rendered Day 1 .. Day 9 -->
+          </div>
+        </div>
+
+        <!-- Selected Day Summary Card (Date, Title, Daily Food Budget) -->
+        <div id="selectedDayBanner" class="bg-white p-3.5 rounded-2xl shadow-xs border border-zinc-100 space-y-2">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Special Route Comparison Widget (Shown on Day 4 & Day 7 where Excel has 2 route options) -->
+        <div id="dayRouteComparisonContainer" class="hidden"></div>
+
+        <!-- Timeline List of Activities -->
+        <div id="itineraryTimeline" class="relative space-y-3 pb-4">
+          <!-- Dynamically populated timeline items -->
+        </div>
+
+      </section>
+
+      <!-- ================= TAB 3: MULTI-CURRENCY BUDGET (KRW / PHP / JPY) ================= -->
+      <section id="tab-budget" class="hidden px-4 pt-1 space-y-4">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-ios-gray">Sheet1 Master Ledger</p>
+            <h1 class="text-[25px] font-bold tracking-tight text-zinc-900 leading-tight">Trip Budget</h1>
+          </div>
+          <button onclick="openExpenseModal()" class="ios-press bg-ios-blue text-white px-3.5 py-2 rounded-full text-xs font-semibold shadow-md shadow-blue-500/25 flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Item</span>
+          </button>
+        </div>
+
+        <!-- Multi-Currency Grand Totals Card (Row 58 of Sheet1) -->
+        <div class="bg-zinc-900 text-white rounded-3xl p-4 shadow-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Sheet1 Grand Totals (4 Pax)</span>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2.5 py-0.5 rounded-full font-semibold">
+              BPI & KRW Synced
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="bg-white/10 p-3 rounded-2xl border border-white/10">
+              <p class="text-[10px] text-zinc-300 font-medium">Actual Paid (KRW)</p>
+              <p id="totalActualKrw" class="text-lg font-black text-white mt-0.5">₩2,462,000</p>
+              <p id="totalTentativeKrw" class="text-[10px] text-zinc-400 mt-0.5">Tentative: ₩5,792,000</p>
+            </div>
+
+            <div class="bg-white/10 p-3 rounded-2xl border border-white/10">
+              <p class="text-[10px] text-zinc-300 font-medium">Actual Paid (PHP)</p>
+              <p id="totalActualPhp" class="text-lg font-black text-emerald-300 mt-0.5">₱104,747.77</p>
+              <p class="text-[10px] text-zinc-400 mt-0.5">Includes BPI bookings</p>
+            </div>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-2xl border border-white/10 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] text-amber-300 font-bold uppercase">Daily Food Pocket Money (9 Days)</p>
+              <p class="text-sm font-extrabold text-white mt-0.5">JP¥150,000 <span class="text-xs font-normal text-zinc-300">(Sheet1 Target: ¥160,000)</span></p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] text-zinc-300">Priced Meals</p>
+              <p class="text-xs font-bold text-amber-300">¥18,303 est • ¥5,000 actual</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Pills for Budget Table -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <button onclick="setBudgetFilter('all')" id="bfilter-all" class="px-3 py-1.5 rounded-full text-xs font-bold bg-zinc-900 text-white">All (14)</button>
+          <button onclick="setBudgetFilter('bpi')" id="bfilter-bpi" class="px-3 py-1.5 rounded-full text-xs font-bold bg-white text-zinc-700 border border-zinc-200">Paid from BPI</button>
+          <button onclick="setBudgetFilter('krw')" id="bfilter-krw" class="px-3 py-1.5 rounded-full text-xs font-bold bg-white text-zinc-700 border border-zinc-200">Paid in KRW (₩)</button>
+          <button onclick="setBudgetFilter('php')" id="bfilter-php" class="px-3 py-1.5 rounded-full text-xs font-bold bg-white text-zinc-700 border border-zinc-200">Paid in PHP (₱)</button>
+        </div>
+
+        <!-- Itemized Expense Cards List -->
+        <div id="budgetItemsContainer" class="space-y-2.5">
+          <!-- Dynamically rendered from Sheet1 Rows 3-19 -->
+        </div>
+
+        <!-- 9-Day Daily Food Budget Breakdown Card (Sheet1 Rows 21-57) -->
+        <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-zinc-900">9-Day Daily Food Allocation</h3>
+              <p class="text-[11px] text-ios-gray">Total Daily Pocket Money: JP¥150,000</p>
+            </div>
+            <span class="text-xs font-extrabold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">¥150,000</span>
+          </div>
+
+          <div id="dailyFoodBudgetTable" class="divide-y divide-zinc-100 text-xs">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= TAB 4: CHECKLISTS & SHEET2 FOOD BUCKET LIST ================= -->
+      <section id="tab-checklists" class="hidden px-4 pt-1 space-y-4">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-ios-gray">Food List, Bookings & Packing</p>
+            <h1 class="text-[25px] font-bold tracking-tight text-zinc-900 leading-tight">Checklists</h1>
+          </div>
+          <span id="checklistTopBadge" class="inline-block bg-emerald-100 text-emerald-700 font-bold text-xs px-3 py-1 rounded-full">
+            0 / 0 Done
+          </span>
+        </div>
+
+        <!-- Segmented Filter Bar -->
+        <div class="bg-zinc-200/80 p-1 rounded-xl grid grid-cols-3 text-xs font-semibold">
+          <button onclick="setChecklistFilter('all')" id="filter-btn-all" class="py-1.5 rounded-lg bg-white text-zinc-900 shadow-xs transition">
+            All Items
+          </button>
+          <button onclick="setChecklistFilter('todo')" id="filter-btn-todo" class="py-1.5 rounded-lg text-zinc-600 transition">
+            To-Do / To-Try
+          </button>
+          <button onclick="setChecklistFilter('packed')" id="filter-btn-packed" class="py-1.5 rounded-lg text-zinc-600 transition">
+            Completed
+          </button>
+        </div>
+
+        <!-- Quick-Add Checklist Bar -->
+        <form onsubmit="handleQuickAddChecklist(event)" class="bg-white p-2.5 rounded-2xl shadow-xs border border-zinc-200/80 flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <select id="quickChecklistCategory" class="bg-zinc-100 text-zinc-800 text-xs font-semibold px-2.5 py-2 rounded-xl border-0 focus:outline-none">
+              <option value="Tokyo Food Bucket List (Sheet2)">🍜 Food List</option>
+              <option value="Booked Vouchers & Tickets">🎟️ Vouchers</option>
+              <option value="Family Packing & CJ Essentials">🧳 Family Pack</option>
+            </select>
+            <input id="quickChecklistInput" type="text" placeholder="Add food spot, voucher, or item..." required class="flex-1 text-xs bg-zinc-50 px-3 py-2 rounded-xl border border-zinc-200 focus:outline-none focus:border-ios-blue" />
+            <button type="submit" class="ios-press bg-ios-blue text-white w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-xs">
+              <i class="fa-solid fa-plus text-xs"></i>
+            </button>
+          </div>
+        </form>
+
+        <!-- Categorized Checklists Container -->
+        <div id="checklistCategoriesContainer" class="space-y-3.5 pb-4">
+          <!-- Dynamically populated -->
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ================= iOS BOTTOM TAB BAR (4 TABS) ================= -->
+    <nav class="absolute bottom-0 inset-x-0 z-30 ios-blur border-t border-zinc-200/80 pt-1.5 pb-5 px-4">
+      <div class="grid grid-cols-4 gap-1">
+        <!-- Tab 1: Overview -->
+        <button onclick="switchTab('overview')" id="nav-overview" class="ios-press flex flex-col items-center justify-center py-1 text-ios-blue transition">
+          <i class="fa-solid fa-compass text-[18px]"></i>
+          <span class="text-[10px] font-semibold mt-1">Overview</span>
+        </button>
+
+        <!-- Tab 2: Itinerary -->
+        <button onclick="switchTab('itinerary')" id="nav-itinerary" class="ios-press flex flex-col items-center justify-center py-1 text-ios-gray hover:text-zinc-700 transition">
+          <div class="relative">
+            <i class="fa-solid fa-calendar-day text-[18px]"></i>
+            <span class="absolute -top-1 -right-3 bg-ios-blue text-white text-[9px] font-bold px-1.5 rounded-full">9d</span>
+          </div>
+          <span class="text-[10px] font-semibold mt-1">Itinerary</span>
+        </button>
+
+        <!-- Tab 3: Budget -->
+        <button onclick="switchTab('budget')" id="nav-budget" class="ios-press flex flex-col items-center justify-center py-1 text-ios-gray hover:text-zinc-700 transition">
+          <i class="fa-solid fa-wallet text-[18px]"></i>
+          <span class="text-[10px] font-semibold mt-1">Budget</span>
+        </button>
+
+        <!-- Tab 4: Checklists -->
+        <button onclick="switchTab('checklists')" id="nav-checklists" class="ios-press flex flex-col items-center justify-center py-1 text-ios-gray hover:text-zinc-700 transition">
+          <i class="fa-solid fa-list-check text-[18px]"></i>
+          <span class="text-[10px] font-semibold mt-1">Checklists</span>
+        </button>
+      </div>
+
+      <!-- iOS Home Indicator Pill -->
+      <div class="w-32 h-1 bg-zinc-900/80 rounded-full mx-auto mt-2.5"></div>
+    </nav>
+
+    <!-- ================= MODAL 1: ADD / EDIT ITINERARY ACTIVITY ================= -->
+    <div id="activityModalBackdrop" class="hidden absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end">
+      <div id="activityModalSheet" class="sheet-enter w-full bg-[#F2F2F7] rounded-t-[32px] p-5 max-h-[86%] overflow-y-auto no-scrollbar shadow-2xl">
+        <div class="w-10 h-1 bg-zinc-300 rounded-full mx-auto mb-3"></div>
+        <div class="flex items-center justify-between mb-4">
+          <button type="button" onclick="closeActivityModal()" class="text-sm font-medium text-ios-blue">Cancel</button>
+          <h3 id="activityModalTitle" class="text-base font-bold text-zinc-900">New Itinerary Item</h3>
+          <button type="submit" form="activityForm" class="text-sm font-bold text-ios-blue">Save</button>
+        </div>
+
+        <form id="activityForm" onsubmit="saveActivityForm(event)" class="space-y-3">
+          <input type="hidden" id="actEditId" value="" />
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Time / Slot</label>
+              <input id="actTime" type="text" placeholder="e.g. 08:00 AM or Lunch" required class="w-full text-sm font-semibold text-zinc-900 bg-transparent focus:outline-none" />
+            </div>
+
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Category</label>
+              <select id="actCategory" class="w-full text-sm font-semibold text-zinc-900 bg-transparent focus:outline-none">
+                <option value="Sightseeing">📸 Sightseeing</option>
+                <option value="Food">🍜 Meal / Food</option>
+                <option value="Transit">🚅 Transit Route</option>
+                <option value="Flight">✈️ Flight</option>
+                <option value="Hotel">🏠 Airbnb / Stay</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+            <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Title / Activity / Restaurant</label>
+            <input id="actTitle" type="text" placeholder="e.g. Katsuya Asakusa or Sensoji Temple" required class="w-full text-sm font-semibold text-zinc-900 bg-transparent focus:outline-none" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Location / Line</label>
+              <input id="actLocation" type="text" placeholder="e.g. 1-33-3 Asakusa" required class="w-full text-xs font-medium text-zinc-800 bg-transparent focus:outline-none" />
+            </div>
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Cost / Fare Badge</label>
+              <input id="actCost" type="text" placeholder="e.g. JP¥3,245 or 366 Yen" class="w-full text-xs font-medium text-zinc-800 bg-transparent focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+            <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Notes / Menu Order / Pick-up Details</label>
+            <textarea id="actNotes" rows="3" placeholder="Menu order (e.g. Gyudon L-1/M-3), train transfer, or meeting point..." class="w-full text-xs text-zinc-700 bg-transparent focus:outline-none resize-none"></textarea>
+          </div>
+
+          <button type="submit" class="ios-press w-full bg-ios-blue text-white font-bold text-sm py-3.5 rounded-2xl shadow-lg shadow-blue-500/25">
+            Save to Day <span id="modalDayNumLabel">1</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= MODAL 2: ADD / EDIT BUDGET EXPENSE ITEM ================= -->
+    <div id="expenseModalBackdrop" class="hidden absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end">
+      <div id="expenseModalSheet" class="sheet-enter w-full bg-[#F2F2F7] rounded-t-[32px] p-5 max-h-[86%] overflow-y-auto no-scrollbar shadow-2xl">
+        <div class="w-10 h-1 bg-zinc-300 rounded-full mx-auto mb-3"></div>
+        <div class="flex items-center justify-between mb-4">
+          <button type="button" onclick="closeExpenseModal()" class="text-sm font-medium text-ios-blue">Cancel</button>
+          <h3 id="expenseModalTitle" class="text-base font-bold text-zinc-900">Budget Item</h3>
+          <button type="submit" form="expenseForm" class="text-sm font-bold text-ios-blue">Save</button>
+        </div>
+
+        <form id="expenseForm" onsubmit="saveExpenseForm(event)" class="space-y-3">
+          <input type="hidden" id="expEditId" value="" />
+
+          <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+            <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Expense Item Name</label>
+            <input id="expName" type="text" placeholder="e.g. Tokyo Disneyland or Souvenirs" required class="w-full text-sm font-semibold text-zinc-900 bg-transparent focus:outline-none" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Tentative (KRW ₩)</label>
+              <input id="expTentativeKrw" type="number" min="0" value="0" class="w-full text-sm font-semibold text-zinc-900 bg-transparent focus:outline-none" />
+            </div>
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Actual Paid (KRW ₩)</label>
+              <input id="expActualKrw" type="number" min="0" value="0" class="w-full text-sm font-semibold text-zinc-900 bg-transparent focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Actual Paid (PHP ₱)</label>
+              <input id="expActualPhp" type="number" step="0.01" min="0" value="0" class="w-full text-sm font-semibold text-zinc-900 bg-transparent focus:outline-none" />
+            </div>
+            <div class="bg-white p-3 rounded-2xl border border-zinc-200/70">
+              <label class="block text-[10px] font-bold uppercase text-ios-gray mb-1">Rate / Breakdown Note</label>
+              <input id="expRateNote" type="text" placeholder="e.g. Paid from BPI / Adult ₩100k" class="w-full text-xs font-medium text-zinc-800 bg-transparent focus:outline-none" />
+            </div>
+          </div>
+
+          <button type="submit" class="ios-press w-full bg-ios-blue text-white font-bold text-sm py-3.5 rounded-2xl shadow-lg shadow-blue-500/25">
+            Save Budget Entry
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+    const STORAGE_KEY = 'tokyo_family_excel_2026_v2';
+
+    const CATEGORY_STYLES = {
+      Flight: { icon: 'fa-plane-departure', bg: 'bg-sky-100', text: 'text-sky-600', badge: 'bg-sky-50 text-sky-700 border-sky-200' },
+      Hotel: { icon: 'fa-house-chimney', bg: 'bg-rose-100', text: 'text-rose-600', badge: 'bg-rose-50 text-rose-700 border-rose-200' },
+      Food: { icon: 'fa-utensils', bg: 'bg-orange-100', text: 'text-orange-600', badge: 'bg-orange-50 text-orange-700 border-orange-200' },
+      Sightseeing: { icon: 'fa-camera-retro', bg: 'bg-emerald-100', text: 'text-emerald-600', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+      Transit: { icon: 'fa-train-subway', bg: 'bg-purple-100', text: 'text-purple-600', badge: 'bg-purple-50 text-purple-700 border-purple-200' }
+    };
+
+    // Complete 100% faithful dataset from Japan Travel.xlsx (Sheet1 + Sheet2)
+    function getExcelDefaultState() {
+      return {
+        activeTab: 'overview',
+        selectedDay: 1,
+        day4RouteOption: 'A', // Option A (Tokyo Tower first) vs Option B (Shibuya/Shinjuku first)
+        day7RouteOption: 'A', // Option A (via Shinjuku) vs Option B (Direct to Odaiba)
+        budgetFilter: 'all',
+        checklistFilter: 'all',
+
+        // Sheet1 Rows 3-19 Master Budget Items
+        budgetItems: [
+          {
+            id: 'exp-1',
+            name: 'Plane Fare (Incheon ↔ Narita)',
+            rateInfo: 'Rate/Person: ₩400,000 (4 Pax)',
+            tentativeKrw: 1600000,
+            actualKrw: 1440000,
+            actualPhp: 0,
+            actualJpy: 0,
+            note: 'B787-9-YP731 & YP732'
+          },
+          {
+            id: 'exp-2',
+            name: 'Accommodation (Airbnb Home in Sumida)',
+            rateInfo: '8 Nights • 1-chōme-39-17 Yahiro',
+            tentativeKrw: 1400000,
+            actualKrw: 0,
+            actualPhp: 32024.07,
+            actualJpy: 0,
+            note: 'Paid from BPI'
+          },
+          {
+            id: 'exp-3',
+            name: 'Visa Fee',
+            rateInfo: 'Family Visa Processing',
+            tentativeKrw: 320000,
+            actualKrw: 320000,
+            actualPhp: 0,
+            actualJpy: 0,
+            note: 'Paid in KRW'
+          },
+          {
+            id: 'exp-4',
+            name: 'Transportation (Local IC / Trains)',
+            rateInfo: 'Rate/Person: ₩150,000',
+            tentativeKrw: 0,
+            actualKrw: 0,
+            actualPhp: 0,
+            actualJpy: 0,
+            note: 'Tobu Skytree, Ginza, Oedo, Marunouchi Lines'
+          },
+          {
+            id: 'exp-5',
+            name: 'Tokyo DisneyLand (Day 5 - Nov 4)',
+            rateInfo: 'Adult: ₩100,000 (Tent. ₩400k) • Kids: ₩62,000 (Tent. ₩248k)',
+            tentativeKrw: 648000,
+            actualKrw: 268800,
+            actualPhp: 13500.00,
+            actualJpy: 0,
+            note: 'Adult + Kids tickets booked'
+          },
+          {
+            id: 'exp-6',
+            name: 'Tokyo DisneySea (Day 6 - Nov 5)',
+            rateInfo: 'Full Day Park Admission',
+            tentativeKrw: 0,
+            actualKrw: 268800,
+            actualPhp: 13500.00,
+            actualJpy: 0,
+            note: 'Adult + Kids tickets booked'
+          },
+          {
+            id: 'exp-7',
+            name: 'Tokyo Tower (Day 4 - Nov 3)',
+            rateInfo: 'Adult: ₩30,000 (Tent. ₩60k) • Kids: ₩20,000 (Tent. ₩40k)',
+            tentativeKrw: 100000,
+            actualKrw: 0,
+            actualPhp: 0,
+            actualJpy: 0,
+            note: 'Sheet2 Note: Just a picture from outside'
+          },
+          {
+            id: 'exp-8',
+            name: 'Tokyo SkyTree (Day 1 - Oct 31)',
+            rateInfo: 'Adult: ₩36,000 (Tent. ₩72k) • Kids: ₩26,000 (Tent. ₩52k)',
+            tentativeKrw: 124000,
+            actualKrw: 0,
+            actualPhp: 4555.70,
+            actualJpy: 0,
+            note: 'Booked in PHP'
+          },
+          {
+            id: 'exp-9',
+            name: 'Shibuya Sky (Day 4 - Nov 3)',
+            rateInfo: 'Observation Deck Admission',
+            tentativeKrw: 0,
+            actualKrw: 0,
+            actualPhp: 2296.00,
+            actualJpy: 0,
+            note: 'Booked in PHP'
+          },
+          {
+            id: 'exp-10',
+            name: 'Kamakura Day Tour (Day 2 - Nov 1)',
+            rateInfo: '8:00 AM Meet @ JR Tokyo Station BEAMS Sign',
+            tentativeKrw: 0,
+            actualKrw: 0,
+            actualPhp: 11168.00,
+            actualJpy: 0,
+            note: 'Paid from BPI'
+          },
+          {
+            id: 'exp-11',
+            name: 'Yokohama with Ate Jeannete (Day 8 - Nov 7)',
+            rateInfo: 'Day Trip & Activities',
+            tentativeKrw: 0,
+            actualKrw: 0,
+            actualPhp: 13220.00,
+            actualJpy: 0,
+            note: 'Paid from BPI'
+          },
+          {
+            id: 'exp-12',
+            name: 'Narita Skyliner Roundtrip',
+            rateInfo: 'Airport Express Train (Day 1 & Day 9)',
+            tentativeKrw: 0,
+            actualKrw: 0,
+            actualPhp: 4984.00,
+            actualJpy: 0,
+            note: 'Booked in PHP'
+          },
+          {
+            id: 'exp-13',
+            name: 'Harry Potter Studio Tour Tokyo (Day 7 - Nov 6)',
+            rateInfo: 'Warner Bros. Studio Tour',
+            tentativeKrw: 0,
+            actualKrw: 164400,
+            actualPhp: 9500.00,
+            actualJpy: 0,
+            note: 'Paid in KRW + PHP'
+          },
+          {
+            id: 'exp-14',
+            name: 'Food Budget (JPY160,000 Target / ¥150,000 Daily Sum)',
+            rateInfo: 'Priced Meals Est: JP¥18,303 • Logged Actual: JP¥5,000',
+            tentativeKrw: 1600000,
+            actualKrw: 0,
+            actualPhp: 0,
+            actualJpy: 5000,
+            note: '9-Day Daily Allocations = JP¥150,000'
+          }
+        ],
+
+        // All 9 Days combining Sheet1 (Meals & Daily JPY Budgets) + Sheet2 (Schedules, Pick-up details & Transit legs)
+        days: [
+          {
+            dayNumber: 1,
+            dateText: 'Oct 31, 2026 (Sat)',
+            title: 'Arrival, Sumida Airbnb & Tokyo Skytree',
+            foodBudgetJpy: 10000,
+            activities: [
+              {
+                id: 'd1-1',
+                time: '05:30 AM',
+                category: 'Transit',
+                title: 'Incheon Airport Bound — Bus 3300',
+                location: 'To Incheon Int’l Airport Terminal 1',
+                cost: 'Bus 3300',
+                notes: 'Early morning departure to make 5:45 AM check-in counter opening.',
+                completed: false
+              },
+              {
+                id: 'd1-2',
+                time: '05:45 – 07:45',
+                category: 'Flight',
+                title: 'Check-In & Flight B787-9-YP731 (ICN → NRT)',
+                location: 'Incheon T1 → Narita T2',
+                cost: '₩1,440,000',
+                notes: 'Departure: 08:45 AM • Arrival: 11:20 AM (Duration: 2h 45m).',
+                completed: false
+              },
+              {
+                id: 'd1-3',
+                time: 'Breakfast',
+                category: 'Food',
+                title: 'Breakfast: BYOB (Bread)',
+                location: 'Incheon Airport / In-Flight',
+                cost: 'BYOB',
+                notes: 'Bring Your Own Bread for morning airport & flight.',
+                completed: false
+              },
+              {
+                id: 'd1-4',
+                time: '12:00 PM',
+                category: 'Transit',
+                title: 'Narita Skyliner into Tokyo',
+                location: 'Narita Terminal 2 Station',
+                cost: '₱4,984.00 (RT)',
+                notes: 'Redeem roundtrip Narita Skyliner vouchers.',
+                completed: false
+              },
+              {
+                id: 'd1-5',
+                time: 'Lunch',
+                category: 'Food',
+                title: 'Lunch: Konbini (7-Eleven)',
+                location: 'En route / Sumida',
+                cost: 'Est ¥3,600 • Act ¥5,000',
+                notes: 'Quick convenient lunch grab after arrival.',
+                completed: false
+              },
+              {
+                id: 'd1-6',
+                time: '04:00 PM',
+                category: 'Hotel',
+                title: 'Check-In: Airbnb Home in Sumida',
+                location: '1-chōme-39-17 Yahiro Sumida City, Tokyo 131-0041',
+                cost: '₱32,024.07 (BPI)',
+                notes: 'Nearby Konbini: Lawson (Yahiro 1-Chome Shop) & Family Mart (Yahiro 6-Chome Shop).',
+                completed: false
+              },
+              {
+                id: 'd1-7',
+                time: 'Afternoon',
+                category: 'Sightseeing',
+                title: 'Catholic Hongjo Church & Tokyo Skytree',
+                location: 'Sumida City / Oshiage',
+                cost: '₱4,555.70',
+                notes: 'Skytree Rates: Adult ₩36,000 / Kids ₩26,000. Enjoy Snacks at Skytree.',
+                completed: false
+              },
+              {
+                id: 'd1-8',
+                time: 'Dinner',
+                category: 'Food',
+                title: 'Dinner: Ramen Express Ippudo (Skytree) / Pepper Lunch',
+                location: 'Tokyo Solamachi (Skytree)',
+                cost: 'JP¥4,542',
+                notes: 'Order: Tonkotsu (order kid’s ramen for CJ) / Hamburger Steak at Pepper Lunch.',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 2,
+            dateText: 'Nov 1, 2026 (Sun)',
+            title: 'Kamakura Day Tour & Asakusa Night',
+            foodBudgetJpy: 15000,
+            activities: [
+              {
+                id: 'd2-1',
+                time: 'Morning',
+                category: 'Food',
+                title: 'Breakfast: Konbini / Bento or Yoshinoya',
+                location: 'Yahiro / Tokyo Station',
+                cost: 'From ¥15,000/day',
+                notes: 'Sheet1: Konbini/Bento • Sheet2: Yoshinoya.',
+                completed: false
+              },
+              {
+                id: 'd2-2',
+                time: '07:05 AM',
+                category: 'Transit',
+                title: 'Transit: Accom → JR Tokyo Station',
+                location: 'Tobu Skytree / Marunouchi Line',
+                cost: '366 Yen • 47 min',
+                notes: 'Depart early to arrive before 8:00 AM tour pick-up.',
+                completed: false
+              },
+              {
+                id: 'd2-3',
+                time: '08:00 AM',
+                category: 'Sightseeing',
+                title: 'Kamakura Tour (Meet @ BEAMS Sign)',
+                location: 'Shin-Marunouchi Bldg in front of JR Tokyo Sta.',
+                cost: '₱11,168.00 (BPI)',
+                notes: 'Pick-up: Under the BEAMS sign in the Shin-Marunouchi Building in front of JR Tokyo Station, 1 Chome-5-1 Marunouchi, Chiyoda City, Tokyo 100-6590.',
+                completed: false
+              },
+              {
+                id: 'd2-4',
+                time: 'Lunch',
+                category: 'Food',
+                title: 'Lunch: Kamakura Local Food',
+                location: 'Kamakura',
+                cost: 'Included in Daily ¥15k',
+                notes: 'Explore Kamakura street food & lunch stops during the tour.',
+                completed: false
+              },
+              {
+                id: 'd2-5',
+                time: 'Evening',
+                category: 'Transit',
+                title: 'Return Transit: JR Tokyo Sta. → Accom (or Asakusa)',
+                location: 'Tozai Line / Asakusa Line (or Ginza Line)',
+                cost: '432 Yen • 41 min',
+                notes: 'Direct to Accom: 41min / Tozai Line / Asakusa Line / 432 Yen. If going to Ichiran Asakusa: From Tokyo Station walk towards Kyobashi Sta., ride Ginza Line going to Asakusa.',
+                completed: false
+              },
+              {
+                id: 'd2-6',
+                time: 'Dinner',
+                category: 'Food',
+                title: 'Dinner: Ichiran Asakusa (closes 10PM) / Yoshinoya / Denny’s',
+                location: '1 Chome-1-16 Asakusa',
+                cost: 'Pork Tonkotsu Ramen',
+                notes: 'Ichiran Asakusa closes at 10:00 PM. Alternative options: Yoshinoya or Denny’s.',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 3,
+            dateText: 'Nov 2, 2026 (Mon)',
+            title: 'Mt. Fuji Day Tour',
+            foodBudgetJpy: 15000,
+            activities: [
+              {
+                id: 'd3-1',
+                time: 'Morning',
+                category: 'Food',
+                title: 'Breakfast: Konbini / Bento',
+                location: 'Sumida / Tokyo Station',
+                cost: 'From Daily ¥15k',
+                notes: 'Grab bento/breakfast before boarding the Mt. Fuji tour coach.',
+                completed: false
+              },
+              {
+                id: 'd3-2',
+                time: '07:05 AM',
+                category: 'Transit',
+                title: 'Transit: Accom → JR Tokyo Station',
+                location: 'Tobu Skytree / Marunouchi Line',
+                cost: '366 Yen • 47 min',
+                notes: 'Same morning commute to JR Tokyo Station.',
+                completed: false
+              },
+              {
+                id: 'd3-3',
+                time: '08:00 AM',
+                category: 'Sightseeing',
+                title: 'Mt. Fuji Day Tour Pick-Up',
+                location: 'JR Tokyo Sta. 1F, Marunouchi South Exit',
+                cost: 'Booked Tour',
+                notes: 'Pick-up: JR Tokyo Station 1F, Marunouchi South Exit, Otemachi direction exit, 250 meters to the front right (meet on the first floor under the Beams sign in the Shin-Marunouchi Bldg.).',
+                completed: false
+              },
+              {
+                id: 'd3-4',
+                time: 'Lunch',
+                category: 'Food',
+                title: 'Lunch: Open (Mt. Fuji Area)',
+                location: 'Mt. Fuji / Kawaguchiko',
+                cost: 'From Daily ¥15k',
+                notes: 'Flexible lunch during Mt. Fuji tour.',
+                completed: false
+              },
+              {
+                id: 'd3-5',
+                time: 'Dinner',
+                category: 'Food',
+                title: 'Dinner: Yoshinoya',
+                location: 'Tokyo / Near Accom',
+                cost: 'JP¥2,146',
+                notes: 'Planned Order: Gyudon L-1 / M-3.',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 4,
+            dateText: 'Nov 3, 2026 (Tue)',
+            title: 'Sensoji, Akihabara, Ginza, Shibuya Sky, Shinjuku & Tokyo Tower',
+            foodBudgetJpy: 15000,
+            activities: [
+              {
+                id: 'd4-1',
+                time: 'Morning',
+                category: 'Transit',
+                title: 'Leg 1: Accom → Sensoji (Asakusa Temple)',
+                location: 'Oshiage Line (21m) or Tobu Skytree Line (27m)',
+                cost: '157 Yen • 21–27 min',
+                notes: 'Option 1: 21m via Oshiage Line • Option 2: 27min via Tobu Skytree Line (157 Yen).',
+                completed: false
+              },
+              {
+                id: 'd4-2',
+                time: 'Breakfast',
+                category: 'Food',
+                title: 'Breakfast: Katsuya Asakusa',
+                location: '1-33-3 Asakusa',
+                cost: 'JP¥3,245',
+                notes: 'Planned Order: Katsudon L-1 / M-3 / Miso-2.',
+                completed: false
+              },
+              {
+                id: 'd4-3',
+                time: 'Morning',
+                category: 'Sightseeing',
+                title: 'Asakusa Temple (Sensoji)',
+                location: 'Asakusa, Taito City',
+                cost: 'Free Entry',
+                notes: 'Explore Kaminarimon Gate, Nakamise Street & Sensoji main hall.',
+                completed: false
+              },
+              {
+                id: 'd4-4',
+                time: 'Late Morning',
+                category: 'Transit',
+                title: 'Leg 2: Sensoji → Akihabara',
+                location: 'Ginza Line',
+                cost: '178 Yen • 18 min',
+                notes: 'Explore Akihabara Electric Town & anime/gaming shops.',
+                completed: false
+              },
+              {
+                id: 'd4-5',
+                time: 'Midday',
+                category: 'Transit',
+                title: 'Leg 3: Akihabara → Ginza (Seiko Watch)',
+                location: 'Ginza Line',
+                cost: '178 Yen • 16 min',
+                notes: 'Visit Ginza district & Seiko Watch landmark.',
+                completed: false
+              },
+              {
+                id: 'd4-6',
+                time: 'Lunch',
+                category: 'Food',
+                title: 'Lunch: Mos Burger (Tokyo Tower)',
+                location: 'Near Tokyo Tower / Shiba Park',
+                cost: 'Burger',
+                notes: 'Tokyo Tower stop is for outside photos ("just a picture from outside").',
+                completed: false
+              },
+              {
+                id: 'd4-7',
+                time: 'Afternoon',
+                category: 'Sightseeing',
+                title: 'Shibuya Sky & Hachiko Statue',
+                location: 'Shibuya',
+                cost: '₱2,296.00',
+                notes: 'Visit Hachiko statue, Shibuya Crossing, and Shibuya Sky observation deck.',
+                completed: false
+              },
+              {
+                id: 'd4-8',
+                time: 'Late Afternoon',
+                category: 'Sightseeing',
+                title: 'Shinjuku — Tokyo Metropolitan Office',
+                location: 'Shinjuku',
+                cost: 'Free Viewpoint',
+                notes: 'Shibuya → Shinjuku: 20min Shonan-Shinjuku Line / 22min Yamanote Line / 20min Saikyo Line (199 Yen).',
+                completed: false
+              },
+              {
+                id: 'd4-9',
+                time: 'Dinner',
+                category: 'Food',
+                title: 'Dinner: Ichiran (Noodles) or Yoshinoya near Tokyo Tower',
+                location: 'Shinjuku / Tokyo Tower / Asakusa',
+                cost: 'From Daily ¥15k',
+                notes: 'Return to Accom: Shinjuku → Accom (54min / Oedo Line / Asakusa / 418 Yen) OR Tokyo Tower → Accom (45min / Asakusa Line).',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 5,
+            dateText: 'Nov 4, 2026 (Wed)',
+            title: 'Tokyo Disneyland Full-Day Magic',
+            foodBudgetJpy: 25000,
+            activities: [
+              {
+                id: 'd5-1',
+                time: 'Morning',
+                category: 'Food',
+                title: 'Breakfast: Konbini',
+                location: 'En route to Maihama',
+                cost: 'From Daily ¥25k',
+                notes: 'Quick breakfast before entering Tokyo Disneyland.',
+                completed: false
+              },
+              {
+                id: 'd5-2',
+                time: 'All Day',
+                category: 'Sightseeing',
+                title: 'Tokyo Disneyland',
+                location: 'Maihama, Urayasu',
+                cost: '₩268,800 + ₱13,500',
+                notes: 'Sheet1 Rates: Adult ₩100,000 / Kids ₩62,000. Full day of rides, parades & fireworks!',
+                completed: false
+              },
+              {
+                id: 'd5-3',
+                time: 'Lunch',
+                category: 'Food',
+                title: 'Lunch: Grandma Sara’s Kitchen',
+                location: 'Critter Country, Tokyo Disneyland',
+                cost: 'From Daily ¥25k',
+                notes: 'Cozy omurice andハンバーグ (hamburg steak) sets inside Disneyland.',
+                completed: false
+              },
+              {
+                id: 'd5-4',
+                time: 'Dinner',
+                category: 'Food',
+                title: 'Dinner: Hungry Bear Restaurant',
+                location: 'Westernland, Tokyo Disneyland',
+                cost: 'From Daily ¥25k',
+                notes: 'Famous Disney Japanese curry rice (mild/medium) great for kids & adults.',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 6,
+            dateText: 'Nov 5, 2026 (Thu)',
+            title: 'Tokyo DisneySea Adventure',
+            foodBudgetJpy: 25000,
+            activities: [
+              {
+                id: 'd6-1',
+                time: 'Morning',
+                category: 'Food',
+                title: 'Breakfast: Konbini',
+                location: 'En route to DisneySea',
+                cost: 'From Daily ¥25k',
+                notes: 'Morning konbini grab before DisneySea rope drop.',
+                completed: false
+              },
+              {
+                id: 'd6-2',
+                time: 'All Day',
+                category: 'Sightseeing',
+                title: 'Tokyo DisneySea',
+                location: 'Maihama, Urayasu',
+                cost: '₩268,800 + ₱13,500',
+                notes: 'Explore Fantasy Springs, Mediterranean Harbor, Mysterious Island & Mermaid Lagoon.',
+                completed: false
+              },
+              {
+                id: 'd6-3',
+                time: 'Lunch & Dinner',
+                category: 'Food',
+                title: 'DisneySea Park Dining & Snacks',
+                location: 'Inside Tokyo DisneySea',
+                cost: 'Daily Budget: JP¥25,000',
+                notes: 'Open park dining & themed DisneySea snacks.',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 7,
+            dateText: 'Nov 6, 2026 (Fri)',
+            title: 'Warner Bros. Harry Potter, St. Mary Cathedral & Odaiba',
+            foodBudgetJpy: 20000,
+            activities: [
+              {
+                id: 'd7-1',
+                time: 'Breakfast',
+                category: 'Food',
+                title: 'Breakfast: McDo (McDonald’s)',
+                location: 'Sumida / En route',
+                cost: 'From Daily ¥20k',
+                notes: 'Morning McGriddles / McDonald’s breakfast set.',
+                completed: false
+              },
+              {
+                id: 'd7-2',
+                time: 'Morning',
+                category: 'Transit',
+                title: 'Leg 1: Accom → Warner Bros. Studio',
+                location: 'Oshiage Line / Oedo Line to Toshimaen',
+                cost: '523 Yen • 1hr 20min',
+                notes: 'Direct subway connection via Oshiage & Oedo Lines.',
+                completed: false
+              },
+              {
+                id: 'd7-3',
+                time: 'Late Morning',
+                category: 'Sightseeing',
+                title: 'Warner Bros. Studio Tour Tokyo – The Making of Harry Potter',
+                location: 'Nerima City, Tokyo',
+                cost: '₩164,400 + ₱9,500',
+                notes: 'Explore Great Hall, Diagon Alley, Hogwarts Express & Butterbeer!',
+                completed: false
+              },
+              {
+                id: 'd7-4',
+                time: 'Afternoon',
+                category: 'Transit',
+                title: 'Leg 2: Warner Bros. → St. Mary Tokyo Cathedral',
+                location: 'Toshima Line / Bus 61',
+                cost: '379 Yen • 41 min',
+                notes: 'Take Toshima Line and transfer to Bus 61 to St. Mary’s Cathedral.',
+                completed: false
+              },
+              {
+                id: 'd7-5',
+                time: 'Afternoon',
+                category: 'Sightseeing',
+                title: 'St. Mary’s Cathedral Tokyo (Sekiguchi Church)',
+                location: 'Bunkyo City, Tokyo',
+                cost: 'Free Entry',
+                notes: 'Iconic Kenzo Tange architectural landmark church.',
+                completed: false
+              },
+              {
+                id: 'd7-6',
+                time: 'Late Afternoon / Evening',
+                category: 'Sightseeing',
+                title: 'Shinjuku (Metropolitan Office) & Odaiba Waterfront',
+                location: 'Shinjuku → Odaiba (Yurikamome Line)',
+                cost: 'See Route Options Above',
+                notes: 'Route Option A: St. Mary → Shinjuku (41m/Bus 61/210¥) → Odaiba (50m/Oedo+Yurikamome/597¥). Route Option B: St. Mary → Odaiba direct (1h 4m/Yurakucho+Yurikamome/534¥).',
+                completed: false
+              },
+              {
+                id: 'd7-7',
+                time: 'Night',
+                category: 'Transit',
+                title: 'Return: Odaiba → Accom',
+                location: 'Yurikamome / Asakusa Line',
+                cost: '691 Yen • 1h 4min',
+                notes: 'Scenic monorail across Rainbow Bridge connecting to Asakusa Line.',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 8,
+            dateText: 'Nov 7, 2026 (Sat)',
+            title: 'Yokohama Day Trip with Ate Jeannete',
+            foodBudgetJpy: 15000,
+            activities: [
+              {
+                id: 'd8-1',
+                time: 'All Day',
+                category: 'Sightseeing',
+                title: 'Yokohama Tour with Ate Jeannete',
+                location: 'Yokohama (Minato Mirai / Chinatown / Red Brick)',
+                cost: '₱13,220.00 (BPI)',
+                notes: 'Sheet1 Note: Paid from BPI (₱13,220.00). Full day exploring Yokohama with Ate Jeannete!',
+                completed: false
+              },
+              {
+                id: 'd8-2',
+                time: 'Meals',
+                category: 'Food',
+                title: 'Yokohama Dining & Snacks',
+                location: 'Yokohama',
+                cost: 'Daily Budget: JP¥15,000',
+                notes: 'Great opportunity to try Karaage Food, Conveyor Sushi, or Chinatown delicacies.',
+                completed: false
+              }
+            ]
+          },
+          {
+            dayNumber: 9,
+            dateText: 'Nov 8, 2026 (Sun)',
+            title: 'Home Bound — Narita to Incheon',
+            foodBudgetJpy: 10000,
+            activities: [
+              {
+                id: 'd9-1',
+                time: 'Breakfast',
+                category: 'Food',
+                title: 'Breakfast: Yoshinoya',
+                location: 'Sumida / En route',
+                cost: 'From Daily ¥10k',
+                notes: 'Final morning Gyudon breakfast in Tokyo.',
+                completed: false
+              },
+              {
+                id: 'd9-2',
+                time: '10:00 AM',
+                category: 'Hotel',
+                title: 'Check-Out: Airbnb Home in Sumida',
+                location: '1-chōme-39-17 Yahiro Sumida City',
+                cost: 'Check-out by 10AM',
+                notes: 'Double check all chargers, passports, and souvenirs before locking up.',
+                completed: false
+              },
+              {
+                id: 'd9-3',
+                time: '09:30 – 11:30',
+                category: 'Transit',
+                title: 'Narita Skyliner & Airport Check-In Counter',
+                location: 'Narita Terminal 2',
+                cost: 'Skyliner RT Included',
+                notes: 'Flight B787-9-YP732 Check-in Counter Hours: 9:30 AM – 11:30 AM.',
+                completed: false
+              },
+              {
+                id: 'd9-4',
+                time: 'Lunch',
+                category: 'Food',
+                title: 'Lunch: Tokyo Tonkotsu Base (Narita Airport)',
+                location: 'Narita Airport Terminal 2',
+                cost: 'JP¥4,770',
+                notes: 'Planned Order: Tonkotsu 1/2/3/4 (Pork Tonkotsu Ramen).',
+                completed: false
+              },
+              {
+                id: 'd9-5',
+                time: '12:30 – 15:20',
+                category: 'Flight',
+                title: 'Return Flight B787-9-YP732 (NRT → ICN)',
+                location: 'Narita T2 → Incheon T1',
+                cost: 'Duration: 2h 50m',
+                notes: 'Departs Narita T2 at 12:30 PM • Arrives Incheon T1 at 3:20 PM (15:20).',
+                completed: false
+              }
+            ]
+          }
+        ],
+
+        // Checklists combining Sheet2 Food Bucket List (Rows 70-84) + Booked Vouchers + Family Packing
+        checklists: [
+          // Category 1: Tokyo Food Bucket List (Exact 12 spots from Sheet2 Rows 71-82)
+          { id: 'f-1', category: 'Tokyo Food Bucket List (Sheet2)', text: '1. Ramen — Ramen Express Ippudo (Skytree) & Tokyo Tonkotsu Base (Narita)', completed: false },
+          { id: 'f-2', category: 'Tokyo Food Bucket List (Sheet2)', text: '2. Conveyor — Conveyor Belt Sushi (Kaitenzushi)', completed: false },
+          { id: 'f-3', category: 'Tokyo Food Bucket List (Sheet2)', text: '3. Yoshinoya — Gyudon L-1 / M-3 (Day 2, Day 3 ¥2,146, Day 9)', completed: false },
+          { id: 'f-4', category: 'Tokyo Food Bucket List (Sheet2)', text: '4. Katsuya Asakusa (1-33-3 Asakusa) — Katsudon L-1/M-3/Miso-2 (¥3,245)', completed: false },
+          { id: 'f-5', category: 'Tokyo Food Bucket List (Sheet2)', text: '5. Karaage Food — Japanese Fried Chicken', completed: false },
+          { id: 'f-6', category: 'Tokyo Food Bucket List (Sheet2)', text: '6. Mos Burger (Tokyo Tower) — Day 4 Lunch Burger', completed: false },
+          { id: 'f-7', category: 'Tokyo Food Bucket List (Sheet2)', text: '7. McDo (McDonald’s Japan) — Day 7 Breakfast', completed: false },
+          { id: 'f-8', category: 'Tokyo Food Bucket List (Sheet2)', text: '8. KFC Japan', completed: false },
+          { id: 'f-9', category: 'Tokyo Food Bucket List (Sheet2)', text: '9. Ichiran Asakusa (1 Chome-1-16 Asakusa, closes 10PM) — Pork Tonkotsu Ramen', completed: false },
+          { id: 'f-10', category: 'Tokyo Food Bucket List (Sheet2)', text: '10. Denny’s Japan (Day 2 Dinner option)', completed: false },
+          { id: 'f-11', category: 'Tokyo Food Bucket List (Sheet2)', text: '11. Bento — Konbini / Station Bento (7-Eleven, Lawson Yahiro 1-Chome, FamilyMart Yahiro 6-Chome)', completed: false },
+          { id: 'f-12', category: 'Tokyo Food Bucket List (Sheet2)', text: '12. Pepper Lunch (Skytree) — Hamburger Steak (Day 1 Dinner)', completed: false },
+
+          // Category 2: Booked Vouchers & Tickets (From Sheet1 Paid Items)
+          { id: 'v-1', category: 'Booked Vouchers & Tickets', text: 'Flights B787-9-YP731 & YP732 Confirmed (Paid ₩1,440,000)', completed: true },
+          { id: 'v-2', category: 'Booked Vouchers & Tickets', text: 'Airbnb Sumida (1-chōme-39-17 Yahiro) Confirmed (Paid ₱32,024.07 BPI)', completed: true },
+          { id: 'v-3', category: 'Booked Vouchers & Tickets', text: 'Japan Tourist Visas Approved (Paid ₩320,000)', completed: true },
+          { id: 'v-4', category: 'Booked Vouchers & Tickets', text: 'Narita Skyliner Roundtrip QR Vouchers (Paid ₱4,984.00)', completed: true },
+          { id: 'v-5', category: 'Booked Vouchers & Tickets', text: 'Tokyo SkyTree Admission Vouchers (Paid ₱4,555.70)', completed: true },
+          { id: 'v-6', category: 'Booked Vouchers & Tickets', text: 'Kamakura Day Tour Voucher — Meet 8AM @ BEAMS Sign (Paid ₱11,168.00 BPI)', completed: true },
+          { id: 'v-7', category: 'Booked Vouchers & Tickets', text: 'Mt. Fuji Day Tour Voucher — Meet 8AM @ JR Tokyo Marunouchi South Exit', completed: true },
+          { id: 'v-8', category: 'Booked Vouchers & Tickets', text: 'Shibuya Sky Timed Entry QR Tickets (Paid ₱2,296.00)', completed: true },
+          { id: 'v-9', category: 'Booked Vouchers & Tickets', text: 'Tokyo Disneyland Tickets — Nov 4 (Paid ₩268,800 + ₱13,500)', completed: true },
+          { id: 'v-10', category: 'Booked Vouchers & Tickets', text: 'Tokyo DisneySea Tickets — Nov 5 (Paid ₩268,800 + ₱13,500)', completed: true },
+          { id: 'v-11', category: 'Booked Vouchers & Tickets', text: 'Warner Bros. Harry Potter Studio Tickets — Nov 6 (Paid ₩164,400 + ₱9,500)', completed: true },
+          { id: 'v-12', category: 'Booked Vouchers & Tickets', text: 'Yokohama Trip with Ate Jeannete — Nov 7 (Paid ₱13,220.00 BPI)', completed: true },
+
+          // Category 3: Family Packing & CJ Essentials
+          { id: 'p-1', category: 'Family Packing & CJ Essentials', text: '4x Passports & Visit Japan Web Immigration QR Codes', completed: false },
+          { id: 'p-2', category: 'Family Packing & CJ Essentials', text: 'BYOB Bread for Day 1 Morning (Bus 3300 @ 5:30 AM & Flight)', completed: false },
+          { id: 'p-3', category: 'Family Packing & CJ Essentials', text: 'JP¥150,000–160,000 Cash in Yen for Daily Food & Transit IC Cards', completed: false },
+          { id: 'p-4', category: 'Family Packing & CJ Essentials', text: 'Suica / Pasmo IC Cards for all 4 travelers (Tobu, Ginza, Oedo, Yurikamome lines)', completed: false },
+          { id: 'p-5', category: 'Family Packing & CJ Essentials', text: 'Comfortable walking shoes & autumn jackets for CJ and family', completed: false },
+          { id: 'p-6', category: 'Family Packing & CJ Essentials', text: 'Power banks & Type-A plug adapters for Disneyland, DisneySea & Fuji days', completed: false }
+        ]
+      };
+    }
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return getExcelDefaultState();
+        const parsed = JSON.parse(raw);
+        if (!parsed.days || parsed.days.length < 9) return getExcelDefaultState();
+        return parsed;
+      } catch (e) {
+        return getExcelDefaultState();
+      }
+    }
+
+    function saveState(toastMsg) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.warn('Could not save state', e);
+      }
+      if (toastMsg) {
+        showIslandToast(toastMsg, 'Saved to iPhone storage');
+      }
+    }
+
+    // ================= RENDER ENGINE =================
+    function renderApp() {
+      ['overview', 'itinerary', 'budget', 'checklists'].forEach(tab => {
+        const section = document.getElementById(`tab-${tab}`);
+        const navBtn = document.getElementById(`nav-${tab}`);
+        if (appState.activeTab === tab) {
+          section.classList.remove('hidden');
+          navBtn.classList.remove('text-ios-gray');
+          navBtn.classList.add('text-ios-blue');
+        } else {
+          section.classList.add('hidden');
+          navBtn.classList.remove('text-ios-blue');
+          navBtn.classList.add('text-ios-gray');
+        }
+      });
+
+      renderOverviewMetrics();
+      renderItineraryTab();
+      renderBudgetTab();
+      renderChecklistsTab();
+    }
+
+    function renderOverviewMetrics() {
+      let totalActs = 0;
+      appState.days.forEach(d => { totalActs += d.activities.length; });
+      document.getElementById('statTotalActs').textContent = `${totalActs} Stops`;
+
+      const foodList = appState.checklists.filter(c => c.category === 'Tokyo Food Bucket List (Sheet2)');
+      const doneFood = foodList.filter(c => c.completed).length;
+      document.getElementById('statFoodChecklist').textContent = `${doneFood}/${foodList.length} Tried`;
+    }
+
+    // ================= RENDER TAB 2: 9-DAY ITINERARY =================
+    function renderItineraryTab() {
+      const dayObj = appState.days.find(d => d.dayNumber === appState.selectedDay) || appState.days[0];
+
+      // 1. Render Day Pills (Day 1 to Day 9)
+      const pillsContainer = document.getElementById('dayPillsContainer');
+      pillsContainer.innerHTML = appState.days.map(d => {
+        const isSelected = d.dayNumber === dayObj.dayNumber;
+        const shortDate = d.dateText.split(',')[0]; // e.g. "Oct 31"
+        return `
+          <button onclick="selectDay(${d.dayNumber})" class="ios-press shrink-0 px-3.5 py-1.5 rounded-2xl text-left transition flex flex-col items-center ${
+            isSelected
+              ? 'bg-ios-blue text-white shadow-sm shadow-blue-500/30'
+              : 'bg-white text-zinc-700 border border-zinc-200/80'
+          }">
+            <span class="text-[11px] font-extrabold leading-tight">Day ${d.dayNumber}</span>
+            <span class="text-[9px] font-medium ${isSelected ? 'text-blue-100' : 'text-ios-gray'}">${escapeHtml(shortDate)}</span>
+          </button>
+        `;
+      }).join('');
+
+      // 2. Render Selected Day Banner with Daily Food Budget
+      const doneCount = dayObj.activities.filter(a => a.completed).length;
+      document.getElementById('selectedDayBanner').innerHTML = `
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-ios-blue">${escapeHtml(dayObj.dateText)}</span>
+              <span class="text-[10px] font-semibold text-ios-gray">• ${doneCount}/${dayObj.activities.length} done</span>
+            </div>
+            <h2 class="text-sm font-extrabold text-zinc-900 mt-1 leading-snug">Day ${dayObj.dayNumber}: ${escapeHtml(dayObj.title)}</h2>
+          </div>
+          <div class="text-right shrink-0 bg-amber-50 border border-amber-200/80 px-2.5 py-1.5 rounded-xl">
+            <span class="block text-[9px] font-bold uppercase text-amber-700">Food Budget</span>
+            <span class="text-xs font-black text-amber-900">JP¥${dayObj.foodBudgetJpy.toLocaleString()}</span>
+          </div>
+        </div>
+      `;
+
+      // 3. Render Route Comparison Widget for Day 4 & Day 7 (from Sheet2 Columns B & C)
+      const routeContainer = document.getElementById('dayRouteComparisonContainer');
+      if (dayObj.dayNumber === 4) {
+        routeContainer.classList.remove('hidden');
+        const isA = appState.day4RouteOption === 'A';
+        routeContainer.innerHTML = `
+          <div class="bg-indigo-950 text-white p-3.5 rounded-2xl shadow-sm space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300"><i class="fa-solid fa-code-branch mr-1"></i>Sheet2 Afternoon Transit Options (After Ginza)</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5 bg-white/10 p-1 rounded-xl text-[11px] font-bold">
+              <button onclick="setDayRoute(4, 'A')" class="py-1.5 rounded-lg transition ${isA ? 'bg-white text-indigo-950 shadow-xs' : 'text-indigo-200'}">Option A: Tower First</button>
+              <button onclick="setDayRoute(4, 'B')" class="py-1.5 rounded-lg transition ${!isA ? 'bg-white text-indigo-950 shadow-xs' : 'text-indigo-200'}">Option B: Shibuya First</button>
+            </div>
+            ${isA ? `
+              <div class="text-[11px] space-y-1 text-indigo-100 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <p>1. <strong>Ginza → Shiba Park (Tokyo Tower):</strong> 24m Hibiya/Mita Line (286¥) <em>OR</em> 10m Taxi (3.4km / 1.5k–2k¥)</p>
+                <p>2. <strong>Tokyo Tower → Shibuya Sky (Hachiko):</strong> 29m Hibiya/Saikyo Line (333¥) <em>OR</em> 15m Taxi (2.5k–3k¥)</p>
+                <p>3. <strong>Shibuya → Shinjuku:</strong> 20m Shonan-Shinjuku / 22m Yamanote / 20m Saikyo Line (199¥)</p>
+                <p>4. <strong>Shinjuku → Accom:</strong> 54m Oedo Line / Asakusa (418¥)</p>
+              </div>
+            ` : `
+              <div class="text-[11px] space-y-1 text-indigo-100 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <p>1. <strong>Ginza → Shibuya:</strong> 22min / Ginza Line / 209 Yen</p>
+                <p>2. <strong>Shibuya → Shinjuku:</strong> 20m Shonan-Shinjuku / 22m Yamanote / 20m Saikyo Line (199¥)</p>
+                <p>3. <strong>Shinjuku → Tokyo Tower:</strong> 33min / Oedo Line / 220 Yen (Yoshinoya near Tokyo Tower)</p>
+                <p>4. <strong>Tokyo Tower → Accom:</strong> 45min / Asakusa Line</p>
+              </div>
+            `}
+          </div>
+        `;
+      } else if (dayObj.dayNumber === 7) {
+        routeContainer.classList.remove('hidden');
+        const isA = appState.day7RouteOption === 'A';
+        routeContainer.innerHTML = `
+          <div class="bg-indigo-950 text-white p-3.5 rounded-2xl shadow-sm space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300"><i class="fa-solid fa-code-branch mr-1"></i>Sheet2 Route Options After St. Mary Cathedral</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5 bg-white/10 p-1 rounded-xl text-[11px] font-bold">
+              <button onclick="setDayRoute(7, 'A')" class="py-1.5 rounded-lg transition ${isA ? 'bg-white text-indigo-950 shadow-xs' : 'text-indigo-200'}">Option 1: Via Shinjuku</button>
+              <button onclick="setDayRoute(7, 'B')" class="py-1.5 rounded-lg transition ${!isA ? 'bg-white text-indigo-950 shadow-xs' : 'text-indigo-200'}">Option 2: Direct Odaiba</button>
+            </div>
+            ${isA ? `
+              <div class="text-[11px] space-y-1 text-indigo-100 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <p>• <strong>St. Mary → Shinjuku (Metropolitan Office):</strong> 41min / Bus 61 / 210 Yen</p>
+                <p>• <strong>Shinjuku → Odaiba:</strong> 50min / Oedo Line / Yurikamome / 597 Yen</p>
+                <p>• <strong>Odaiba → Accom:</strong> 1h 4min / Yurikamome / Asakusa Line / 691 Yen</p>
+              </div>
+            ` : `
+              <div class="text-[11px] space-y-1 text-indigo-100 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <p>• <strong>St. Mary → Odaiba Direct:</strong> 1h 4min / Yurakucho Line / Yurikamome / 534 Yen</p>
+                <p>• <strong>Odaiba → Accom:</strong> 1h 4min / Yurikamome / Asakusa Line / 691 Yen</p>
+              </div>
+            `}
+          </div>
+        `;
+      } else {
+        routeContainer.classList.add('hidden');
+        routeContainer.innerHTML = '';
+      }
+
+      // 4. Render Activities Timeline
+      const timelineContainer = document.getElementById('itineraryTimeline');
+      timelineContainer.innerHTML = dayObj.activities.map((act, idx) => {
+        const st = CATEGORY_STYLES[act.category] || CATEGORY_STYLES.Sightseeing;
+        const isLast = idx === dayObj.activities.length - 1;
+        return `
+          <div class="relative flex gap-3">
+            <div class="flex flex-col items-center">
+              <button onclick="toggleActivityCompleted('${act.id}')" class="check-pop w-7 h-7 rounded-full flex items-center justify-center border-2 transition mt-1 ${
+                act.completed
+                  ? 'bg-ios-green border-ios-green text-white shadow-xs'
+                  : 'bg-white border-zinc-300 text-transparent hover:border-ios-blue'
+              }">
+                <i class="fa-solid fa-check text-[11px]"></i>
+              </button>
+              ${!isLast ? '<div class="w-0.5 flex-1 bg-zinc-200 my-1"></div>' : ''}
+            </div>
+
+            <div class="flex-1 bg-white rounded-2xl p-3.5 shadow-xs border border-zinc-100 transition ${act.completed ? 'opacity-60' : ''}">
+              <div class="flex items-start justify-between gap-1.5">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-extrabold text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded-lg">${escapeHtml(act.time)}</span>
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border ${st.badge} flex items-center gap-1">
+                    <i class="fa-solid ${st.icon} text-[9px]"></i>
+                    ${escapeHtml(act.category)}
+                  </span>
+                  ${act.cost ? `<span class="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/70 px-2 py-0.5 rounded-full">${escapeHtml(act.cost)}</span>` : ''}
+                </div>
+                <div class="flex items-center gap-0.5 shrink-0">
+                  <button onclick="openActivityModal('${act.id}')" class="w-6 h-6 rounded-full text-zinc-400 hover:text-ios-blue flex items-center justify-center">
+                    <i class="fa-solid fa-pen text-[10px]"></i>
+                  </button>
+                  <button onclick="deleteActivity('${act.id}')" class="w-6 h-6 rounded-full text-zinc-400 hover:text-ios-red flex items-center justify-center">
+                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                  </button>
+                </div>
+              </div>
+
+              <h4 class="text-sm font-bold text-zinc-900 mt-1.5 leading-snug ${act.completed ? 'line-through text-zinc-500' : ''}">${escapeHtml(act.title)}</h4>
+
+              <div class="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-600 bg-zinc-100/90 px-2.5 py-1 rounded-lg mt-1.5">
+                <i class="fa-solid fa-location-dot text-ios-red text-[10px]"></i>
+                <span>${escapeHtml(act.location)}</span>
+              </div>
+
+              ${act.notes ? `
+                <p class="text-[11px] text-zinc-600 mt-2 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 leading-relaxed">
+                  ${escapeHtml(act.notes)}
+                </p>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ================= RENDER TAB 3: MULTI-CURRENCY BUDGET =================
+    function renderBudgetTab() {
+      let tentKrw = 0;
+      let actKrw = 0;
+      let actPhp = 0;
+
+      appState.budgetItems.forEach(item => {
+        tentKrw += Number(item.tentativeKrw) || 0;
+        actKrw += Number(item.actualKrw) || 0;
+        actPhp += Number(item.actualPhp) || 0;
+      });
+
+      document.getElementById('totalActualKrw').textContent = `₩${actKrw.toLocaleString()}`;
+      document.getElementById('totalTentativeKrw').textContent = `Tentative: ₩${tentKrw.toLocaleString()}`;
+      document.getElementById('totalActualPhp').textContent = `₱${actPhp.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      // Also sync Overview Hero card
+      document.getElementById('heroKrwPaid').textContent = `₩${actKrw.toLocaleString()}`;
+      document.getElementById('heroPhpPaid').textContent = `₱${actPhp.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      // Filter buttons UI
+      ['all', 'bpi', 'krw', 'php'].forEach(f => {
+        const btn = document.getElementById(`bfilter-${f}`);
+        if (appState.budgetFilter === f) {
+          btn.className = 'px-3 py-1.5 rounded-full text-xs font-bold bg-zinc-900 text-white shrink-0';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-full text-xs font-bold bg-white text-zinc-700 border border-zinc-200 shrink-0';
+        }
+      });
+
+      const filtered = appState.budgetItems.filter(item => {
+        if (appState.budgetFilter === 'bpi') return (item.note || '').toLowerCase().includes('bpi');
+        if (appState.budgetFilter === 'krw') return item.actualKrw > 0;
+        if (appState.budgetFilter === 'php') return item.actualPhp > 0;
+        return true;
+      });
+
+      const container = document.getElementById('budgetItemsContainer');
+      container.innerHTML = filtered.map(item => {
+        const isBpi = (item.note || '').toLowerCase().includes('bpi');
+        return `
+          <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-zinc-100 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="text-xs font-bold text-zinc-900">${escapeHtml(item.name)}</h4>
+                <p class="text-[11px] text-ios-gray mt-0.5">${escapeHtml(item.rateInfo || '')}</p>
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                ${isBpi ? '<span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">Paid from BPI</span>' : ''}
+                <button onclick="openExpenseModal('${item.id}')" class="w-6 h-6 rounded-full text-zinc-400 hover:text-ios-blue flex items-center justify-center">
+                  <i class="fa-solid fa-pen text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-100 text-[11px]">
+              <div>
+                <span class="text-[9px] uppercase font-bold text-zinc-400 block">Tentative (KRW)</span>
+                <span class="font-semibold text-zinc-700">${item.tentativeKrw > 0 ? '₩' + item.tentativeKrw.toLocaleString() : '—'}</span>
+              </div>
+              <div>
+                <span class="text-[9px] uppercase font-bold text-zinc-400 block">Actual (KRW)</span>
+                <span class="font-extrabold ${item.actualKrw > 0 ? 'text-ios-blue' : 'text-zinc-400'}">${item.actualKrw > 0 ? '₩' + item.actualKrw.toLocaleString() : '—'}</span>
+              </div>
+              <div>
+                <span class="text-[9px] uppercase font-bold text-zinc-400 block">Actual (PHP)</span>
+                <span class="font-extrabold ${item.actualPhp > 0 ? 'text-emerald-600' : 'text-zinc-400'}">${item.actualPhp > 0 ? '₱' + item.actualPhp.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}</span>
+              </div>
+            </div>
+
+            ${item.note && !isBpi ? `<p class="text-[10px] text-zinc-500 bg-zinc-50 px-2.5 py-1 rounded-lg">${escapeHtml(item.note)}</p>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // Render 9-Day Daily Food Table
+      const foodTable = document.getElementById('dailyFoodBudgetTable');
+      foodTable.innerHTML = appState.days.map(d => `
+        <div onclick="jumpToDay(${d.dayNumber})" class="py-2 flex items-center justify-between cursor-pointer hover:bg-zinc-50 px-1 rounded-lg">
+          <div>
+            <span class="font-bold text-zinc-900">Day ${d.dayNumber} (${escapeHtml(d.dateText.split(',')[0])})</span>
+            <p class="text-[11px] text-ios-gray truncate max-w-[210px]">${escapeHtml(d.title)}</p>
+          </div>
+          <span class="font-extrabold text-zinc-900">JP¥${d.foodBudgetJpy.toLocaleString()}</span>
+        </div>
+      `).join('');
+    }
+
+    // ================= RENDER TAB 4: CHECKLISTS & SHEET2 FOOD LIST =================
+    function renderChecklistsTab() {
+      const total = appState.checklists.length;
+      const done = appState.checklists.filter(i => i.completed).length;
+      document.getElementById('checklistTopBadge').textContent = `${done} / ${total} Done`;
+
+      ['all', 'todo', 'packed'].forEach(f => {
+        const btn = document.getElementById(`filter-btn-${f}`);
+        if (appState.checklistFilter === f) {
+          btn.className = 'py-1.5 rounded-lg bg-white text-zinc-900 shadow-xs transition';
+        } else {
+          btn.className = 'py-1.5 rounded-lg text-zinc-600 transition';
+        }
+      });
+
+      const categoriesOrder = [
+        { name: 'Tokyo Food Bucket List (Sheet2)', icon: 'fa-bowl-food', color: 'text-orange-600 bg-orange-50' },
+        { name: 'Booked Vouchers & Tickets', icon: 'fa-ticket', color: 'text-ios-blue bg-blue-50' },
+        { name: 'Family Packing & CJ Essentials', icon: 'fa-suitcase-rolling', color: 'text-emerald-600 bg-emerald-50' }
+      ];
+
+      const container = document.getElementById('checklistCategoriesContainer');
+      container.innerHTML = categoriesOrder.map(cat => {
+        const allCatItems = appState.checklists.filter(i => i.category === cat.name);
+        const doneCatCount = allCatItems.filter(i => i.completed).length;
+        const pct = allCatItems.length === 0 ? 0 : Math.round((doneCatCount / allCatItems.length) * 100);
+
+        const filteredItems = allCatItems.filter(item => {
+          if (appState.checklistFilter === 'todo') return !item.completed;
+          if (appState.checklistFilter === 'packed') return item.completed;
+          return true;
+        });
+
+        return `
+          <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl ${cat.color} flex items-center justify-center">
+                  <i class="fa-solid ${cat.icon} text-xs"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-zinc-900">${escapeHtml(cat.name)}</h3>
+                  <p class="text-[11px] text-ios-gray">${doneCatCount} of ${allCatItems.length} completed</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold ${pct === 100 && allCatItems.length > 0 ? 'text-ios-green' : 'text-zinc-500'}">${pct}%</span>
+            </div>
+
+            <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+              <div class="h-full bg-ios-green rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+            </div>
+
+            <div class="divide-y divide-zinc-100">
+              ${filteredItems.length === 0 ? `
+                <p class="text-xs text-ios-gray py-2 italic">No matching items in this filter.</p>
+              ` : filteredItems.map(item => `
+                <div class="py-2.5 flex items-center justify-between gap-2.5">
+                  <button onclick="toggleChecklistItem('${item.id}')" class="flex items-center gap-3 flex-1 text-left">
+                    <span class="check-pop w-5 h-5 rounded-md flex items-center justify-center border shrink-0 ${
+                      item.completed
+                        ? 'bg-ios-blue border-ios-blue text-white'
+                        : 'border-zinc-300 bg-white text-transparent'
+                    }">
+                      <i class="fa-solid fa-check text-[10px]"></i>
+                    </span>
+                    <span class="text-xs font-medium leading-snug ${item.completed ? 'line-through text-zinc-400' : 'text-zinc-800'}">${escapeHtml(item.text)}</span>
+                  </button>
+                  <button onclick="deleteChecklistItem('${item.id}')" class="text-zinc-300 hover:text-ios-red px-1.5 py-0.5 transition">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ================= CONTROLLERS & ACTIONS =================
+    function switchTab(tabName) {
+      appState.activeTab = tabName;
+      document.getElementById('appViewport').scrollTo({ top: 0, behavior: 'smooth' });
+      saveState();
+      renderApp();
+    }
+
+    function selectDay(dayNum) {
+      appState.selectedDay = dayNum;
+      saveState();
+      renderApp();
+    }
+
+    function jumpToDay(dayNum) {
+      appState.selectedDay = dayNum;
+      appState.activeTab = 'itinerary';
+      document.getElementById('appViewport').scrollTo({ top: 0, behavior: 'smooth' });
+      saveState();
+      renderApp();
+    }
+
+    function setDayRoute(dayNum, opt) {
+      if (dayNum === 4) appState.day4RouteOption = opt;
+      if (dayNum === 7) appState.day7RouteOption = opt;
+      saveState(`Day ${dayNum} Route Option ${opt} Selected`);
+      renderApp();
+    }
+
+    function setBudgetFilter(filterVal) {
+      appState.budgetFilter = filterVal;
+      saveState();
+      renderApp();
+    }
+
+    function setChecklistFilter(filterVal) {
+      appState.checklistFilter = filterVal;
+      saveState();
+      renderApp();
+    }
+
+    function toggleActivityCompleted(actId) {
+      const dayObj = appState.days.find(d => d.dayNumber === appState.selectedDay);
+      if (!dayObj) return;
+      const act = dayObj.activities.find(a => a.id === actId);
+      if (act) {
+        act.completed = !act.completed;
+        saveState(act.completed ? 'Completed!' : 'Marked To-Do');
+        renderApp();
+      }
+    }
+
+    function deleteActivity(actId) {
+      const dayObj = appState.days.find(d => d.dayNumber === appState.selectedDay);
+      if (!dayObj) return;
+      dayObj.activities = dayObj.activities.filter(a => a.id !== actId);
+      saveState('Stop Removed');
+      renderApp();
+    }
+
+    function openActivityModal(editId = null) {
+      const dayObj = appState.days.find(d => d.dayNumber === appState.selectedDay);
+      document.getElementById('modalDayNumLabel').textContent = dayObj.dayNumber;
+
+      if (editId) {
+        const existing = dayObj.activities.find(a => a.id === editId);
+        if (existing) {
+          document.getElementById('activityModalTitle').textContent = 'Edit Stop';
+          document.getElementById('actEditId').value = existing.id;
+          document.getElementById('actTime').value = existing.time;
+          document.getElementById('actCategory').value = existing.category;
+          document.getElementById('actTitle').value = existing.title;
+          document.getElementById('actLocation').value = existing.location;
+          document.getElementById('actCost').value = existing.cost || '';
+          document.getElementById('actNotes').value = existing.notes || '';
+        }
+      } else {
+        document.getElementById('activityModalTitle').textContent = `Add to Day ${dayObj.dayNumber}`;
+        document.getElementById('actEditId').value = '';
+        document.getElementById('actTime').value = '14:00';
+        document.getElementById('actCategory').value = 'Sightseeing';
+        document.getElementById('actTitle').value = '';
+        document.getElementById('actLocation').value = '';
+        document.getElementById('actCost').value = '';
+        document.getElementById('actNotes').value = '';
+      }
+
+      const backdrop = document.getElementById('activityModalBackdrop');
+      const sheet = document.getElementById('activityModalSheet');
+      backdrop.classList.remove('hidden');
+      requestAnimationFrame(() => sheet.classList.add('sheet-active'));
+    }
+
+    function closeActivityModal() {
+      const backdrop = document.getElementById('activityModalBackdrop');
+      const sheet = document.getElementById('activityModalSheet');
+      sheet.classList.remove('sheet-active');
+      setTimeout(() => backdrop.classList.add('hidden'), 280);
+    }
+
+    function saveActivityForm(e) {
+      e.preventDefault();
+      const dayObj = appState.days.find(d => d.dayNumber === appState.selectedDay);
+      const editId = document.getElementById('actEditId').value;
+      const time = document.getElementById('actTime').value.trim();
+      const category = document.getElementById('actCategory').value;
+      const title = document.getElementById('actTitle').value.trim();
+      const location = document.getElementById('actLocation').value.trim();
+      const cost = document.getElementById('actCost').value.trim();
+      const notes = document.getElementById('actNotes').value.trim();
+
+      if (!title || !location) return;
+
+      if (editId) {
+        const item = dayObj.activities.find(a => a.id === editId);
+        if (item) {
+          item.time = time;
+          item.category = category;
+          item.title = title;
+          item.location = location;
+          item.cost = cost;
+          item.notes = notes;
+        }
+        saveState('Itinerary Updated');
+      } else {
+        dayObj.activities.push({
+          id: 'act-' + Date.now(),
+          time,
+          category,
+          title,
+          location,
+          cost,
+          notes,
+          completed: false
+        });
+        saveState('Added to Day ' + dayObj.dayNumber);
+      }
+
+      closeActivityModal();
+      renderApp();
+    }
+
+    // Expense Modal Controllers
+    function openExpenseModal(editId = null) {
+      if (editId) {
+        const item = appState.budgetItems.find(b => b.id === editId);
+        if (item) {
+          document.getElementById('expenseModalTitle').textContent = 'Edit Expense';
+          document.getElementById('expEditId').value = item.id;
+          document.getElementById('expName').value = item.name;
+          document.getElementById('expTentativeKrw').value = item.tentativeKrw;
+          document.getElementById('expActualKrw').value = item.actualKrw;
+          document.getElementById('expActualPhp').value = item.actualPhp;
+          document.getElementById('expRateNote').value = item.note || item.rateInfo || '';
+        }
+      } else {
+        document.getElementById('expenseModalTitle').textContent = 'New Expense Entry';
+        document.getElementById('expEditId').value = '';
+        document.getElementById('expName').value = '';
+        document.getElementById('expTentativeKrw').value = 0;
+        document.getElementById('expActualKrw').value = 0;
+        document.getElementById('expActualPhp').value = 0;
+        document.getElementById('expRateNote').value = '';
+      }
+
+      const backdrop = document.getElementById('expenseModalBackdrop');
+      const sheet = document.getElementById('expenseModalSheet');
+      backdrop.classList.remove('hidden');
+      requestAnimationFrame(() => sheet.classList.add('sheet-active'));
+    }
+
+    function closeExpenseModal() {
+      const backdrop = document.getElementById('expenseModalBackdrop');
+      const sheet = document.getElementById('expenseModalSheet');
+      sheet.classList.remove('sheet-active');
+      setTimeout(() => backdrop.classList.add('hidden'), 280);
+    }
+
+    function saveExpenseForm(e) {
+      e.preventDefault();
+      const editId = document.getElementById('expEditId').value;
+      const name = document.getElementById('expName').value.trim();
+      const tentativeKrw = Number(document.getElementById('expTentativeKrw').value) || 0;
+      const actualKrw = Number(document.getElementById('expActualKrw').value) || 0;
+      const actualPhp = Number(document.getElementById('expActualPhp').value) || 0;
+      const note = document.getElementById('expRateNote').value.trim();
+
+      if (!name) return;
+
+      if (editId) {
+        const item = appState.budgetItems.find(b => b.id === editId);
+        if (item) {
+          item.name = name;
+          item.tentativeKrw = tentativeKrw;
+          item.actualKrw = actualKrw;
+          item.actualPhp = actualPhp;
+          item.note = note;
+        }
+        saveState('Budget Updated');
+      } else {
+        appState.budgetItems.push({
+          id: 'exp-' + Date.now(),
+          name,
+          rateInfo: note || 'Custom Entry',
+          tentativeKrw,
+          actualKrw,
+          actualPhp,
+          actualJpy: 0,
+          note
+        });
+        saveState('Added Budget Entry');
+      }
+
+      closeExpenseModal();
+      renderApp();
+    }
+
+    // Checklist Controllers
+    function toggleChecklistItem(itemId) {
+      const item = appState.checklists.find(i => i.id === itemId);
+      if (item) {
+        item.completed = !item.completed;
+        saveState(item.completed ? 'Checked Off!' : 'Unchecked');
+        renderApp();
+      }
+    }
+
+    function deleteChecklistItem(itemId) {
+      appState.checklists = appState.checklists.filter(i => i.id !== itemId);
+      saveState('Item Removed');
+      renderApp();
+    }
+
+    function handleQuickAddChecklist(e) {
+      e.preventDefault();
+      const input = document.getElementById('quickChecklistInput');
+      const category = document.getElementById('quickChecklistCategory').value;
+      const text = input.value.trim();
+      if (!text) return;
+
+      appState.checklists.push({
+        id: 'chk-' + Date.now(),
+        category,
+        text,
+        completed: false
+      });
+
+      input.value = '';
+      saveState('Added to Checklist');
+      renderApp();
+    }
+
+    // Clipboard & Toast Helpers
+    function copyTextToClipboard(text, msg) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showIslandToast(msg || 'Copied!', text);
+      } catch (err) {
+        showIslandToast('Address Ready', text);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    let toastTimer = null;
+    function showIslandToast(title, subtitle) {
+      const toast = document.getElementById('islandToast');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastSub').textContent = subtitle;
+      toast.classList.remove('opacity-0', '-translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-3');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2400);
+    }
+
+    function triggerIslandToast() {
+      showIslandToast('Flights B787-9-YP731 / YP732', 'Oct 31 (08:45 ICN) – Nov 8 (12:30 NRT)');
+    }
+
+    function resetToExcelData() {
+      localStorage.removeItem(STORAGE_KEY);
+      appState = getExcelDefaultState();
+      renderApp();
+      showIslandToast('Excel Data Restored', 'All 9 Days, Flights, Airbnb & Budgets Synced');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function updateIosClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      hours = hours % 12 || 12;
+      document.getElementById('iosClock').textContent = `${hours}:${mins}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateIosClock();
+      setInterval(updateIosClock, 30000);
+      renderApp();
+    });
+  </script>
+</body>
+</html>

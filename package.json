@@ -1,0 +1,11 @@
+{
+  "name": "family-travel-tool",
+  "version": "1.0.0",
+  "description": "Tokyo Family Trip 2026 — iOS Itinerary & Budget Planner",
+  "scripts": {
+    "deploy": "firebase deploy --only hosting"
+  },
+  "keywords": ["travel", "planner", "ios", "firebase"],
+  "author": "",
+  "license": "ISC"
+}
