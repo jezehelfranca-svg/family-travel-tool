@@ -240,6 +240,171 @@
           </div>
         </div>
 
+        
+        <!-- ================= STEP-BY-STEP WALKING ROUTE CARD ================= -->
+        <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="fa-solid fa-person-walking text-base"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Imperial Palace &amp; Marunouchi</span>
+                <h3 class="text-sm font-bold text-zinc-900 leading-tight">Step-by-Step Walking Route</h3>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">3.5–4 km</span>
+          </div>
+
+          <!-- Illustrated Route Map Image with Tap-to-Enlarge -->
+          <div class="relative rounded-2xl overflow-hidden border border-zinc-200/80 shadow-inner group cursor-pointer" onclick="openWalkingMapModal()">
+            <img src="imperial_palace_walking_route.jpg" alt="Imperial Palace Walking Route Map" class="w-full h-48 object-cover object-center group-hover:scale-105 transition duration-300" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent flex flex-col justify-end p-3 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500 text-white px-2 py-0.5 rounded-md">Route Trail &amp; Waypoints</span>
+                  <p class="text-xs font-black text-white mt-0.5">Tokyo Sta. → Kokyo Gaien → Nijubashi → Ōte-mon → East Gardens</p>
+                </div>
+                <div class="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-xs">
+                  <i class="fa-solid fa-expand"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Route Stats Bar -->
+          <div class="grid grid-cols-3 gap-2 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 text-center">
+            <div>
+              <p class="text-[9px] font-bold text-zinc-400 uppercase">Distance</p>
+              <p class="text-xs font-black text-zinc-800">3.5 – 4.0 km</p>
+            </div>
+            <div>
+              <p class="text-[9px] font-bold text-zinc-400 uppercase">Est. Time</p>
+              <p class="text-xs font-black text-zinc-800">2 – 3 Hours</p>
+            </div>
+            <div>
+              <p class="text-[9px] font-bold text-zinc-400 uppercase">Pace</p>
+              <p class="text-xs font-black text-emerald-600">Family Leisure</p>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-zinc-600 leading-relaxed">
+            Follow this illustrated historic circuit starting directly from Tokyo Station red-brick central exit through the gravel plaza, imperial moats, defensive castle gates, and historic Ninomaru gardens. Tap any stop below for step-by-step side panel info.
+          </p>
+
+          <!-- Interactive Stops List -->
+          <div class="space-y-2 pt-1">
+            <!-- Start -->
+            <div onclick="openWalkingStopModal('start')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-blue-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs">
+                  <i class="fa-solid fa-train-subway"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-bold uppercase text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Start</span>
+                    <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Tokyo Station (Marunouchi Side)</h4>
+                  </div>
+                  <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Exit toward Marunouchi central side down Gyoko-dori Avenue.</p>
+                </div>
+              </div>
+              <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
+                <span class="hidden sm:inline">Side Panel</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Stop 1 -->
+            <div onclick="openWalkingStopModal('stop1')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-emerald-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs">
+                  <i class="fa-solid fa-monument"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-bold uppercase text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">Stop 1</span>
+                    <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Kokyo Gaien Garden &amp; Kusunoki Statue</h4>
+                  </div>
+                  <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Open gravel plaza with striking bronze samurai warrior statue.</p>
+                </div>
+              </div>
+              <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
+                <span class="hidden sm:inline">Side Panel</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Stop 2 -->
+            <div onclick="openWalkingStopModal('stop2')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-blue-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs">
+                  <i class="fa-solid fa-archway"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-bold uppercase text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">Stop 2</span>
+                    <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Nijubashi Bridge (Seimon-tetsubashi)</h4>
+                  </div>
+                  <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Definitive Imperial Palace postcard double-bridge photo view.</p>
+                </div>
+              </div>
+              <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
+                <span class="hidden sm:inline">Side Panel</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Stop 3 -->
+            <div onclick="openWalkingStopModal('stop3')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-purple-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-bold uppercase text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">Stop 3</span>
+                    <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Ōte-mon Gate (East Entrance)</h4>
+                  </div>
+                  <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Heavy security checkpoint and massive defensive stone castle walls.</p>
+                </div>
+              </div>
+              <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
+                <span class="hidden sm:inline">Side Panel</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Stop 4 -->
+            <div onclick="openWalkingStopModal('stop4')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-green-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-green-700 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs">
+                  <i class="fa-solid fa-tree"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-bold uppercase text-green-700 bg-green-100 px-1.5 py-0.5 rounded">Stop 4</span>
+                    <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">East Gardens &amp; Edo Castle Keep</h4>
+                  </div>
+                  <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Ninomaru garden, samurai guardhouse &amp; Tenshudai foundation.</p>
+                </div>
+              </div>
+              <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
+                <span class="hidden sm:inline">Side Panel</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Route Overview & Distance Card -->
+          <div class="bg-zinc-50 border border-zinc-200/80 p-3 rounded-xl space-y-1.5 text-xs text-zinc-700">
+            <p class="font-bold text-zinc-900 text-[11px] uppercase tracking-wider text-ios-blue"><i class="fa-solid fa-route mr-1"></i>Route Overview &amp; Distance</p>
+            <p><strong>Total Walking Distance:</strong> Approx. 3.5 to 4 km (2.2 to 2.5 miles) from start to finish.</p>
+            <p><strong>Estimated Time:</strong> 2 to 3 hours, depending on how long you spend exploring the East Gardens.</p>
+            <p><strong>Convenient Finish:</strong> Exit via the northern Kitahanebashi-mon or Kitanomaru Park if you want to extend your walk toward Takebashi Station.</p>
+          </div>
+        </div>
+
+
         <!-- FLIGHT DETAILS CARD (Sheet2 Rows 1-3) -->
         <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3.5">
           <div class="flex items-center justify-between">
@@ -631,6 +796,83 @@
       <div class="w-32 h-1 bg-zinc-900/80 rounded-full mx-auto mt-2.5"></div>
     </nav>
 
+    
+    <!-- ================= MODAL 3: WALKING ROUTE STOP SIDE PANEL / DETAILS ================= -->
+    <div id="walkingModalBackdrop" class="hidden absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end">
+      <div id="walkingModalSheet" class="sheet-enter w-full bg-[#F2F2F7] rounded-t-[32px] p-5 max-h-[88%] overflow-y-auto no-scrollbar shadow-2xl space-y-4">
+        <div class="w-10 h-1 bg-zinc-300 rounded-full mx-auto"></div>
+        
+        <div class="flex items-center justify-between">
+          <span id="walkModalTag" class="text-[10px] font-extrabold uppercase tracking-wider text-ios-blue bg-blue-50 px-2 py-0.5 rounded-md">Route Stop</span>
+          <button type="button" onclick="closeWalkingStopModal()" class="text-sm font-semibold text-ios-blue">Done</button>
+        </div>
+
+        <div>
+          <h3 id="walkModalTitle" class="text-lg font-black text-zinc-900 leading-snug">Stop Title</h3>
+          <p id="walkModalSubtitle" class="text-xs font-semibold text-ios-gray mt-0.5">Subtitle</p>
+        </div>
+
+        <!-- Directions Section -->
+        <div class="bg-white p-3.5 rounded-2xl border border-zinc-200/80 space-y-1.5 shadow-2xs">
+          <div class="flex items-center gap-1.5 text-ios-blue">
+            <i class="fa-solid fa-diamond-turn-right text-xs"></i>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider">Walking Directions</span>
+          </div>
+          <p id="walkModalDirections" class="text-xs text-zinc-800 font-medium leading-relaxed"></p>
+        </div>
+
+        <!-- What to See Section -->
+        <div class="bg-white p-3.5 rounded-2xl border border-zinc-200/80 space-y-1.5 shadow-2xs">
+          <div class="flex items-center gap-1.5 text-amber-600">
+            <i class="fa-solid fa-binoculars text-xs"></i>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider">What To See</span>
+          </div>
+          <p id="walkModalWhatToSee" class="text-xs text-zinc-800 font-medium leading-relaxed"></p>
+        </div>
+
+        <!-- Key Highlights List -->
+        <div class="bg-white p-3.5 rounded-2xl border border-zinc-200/80 space-y-2 shadow-2xs">
+          <div class="flex items-center gap-1.5 text-emerald-600">
+            <i class="fa-solid fa-sparkles text-xs"></i>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider">Historical &amp; Photo Highlights</span>
+          </div>
+          <ul id="walkModalHighlights" class="space-y-1.5 text-xs text-zinc-700 font-medium"></ul>
+        </div>
+
+        <!-- Pro Tip Card -->
+        <div class="bg-amber-50 border border-amber-200/80 p-3 rounded-2xl flex items-start gap-2 text-xs text-amber-900 leading-relaxed shadow-2xs">
+          <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5 shrink-0"></i>
+          <p id="walkModalTip" class="font-medium"></p>
+        </div>
+
+        <button onclick="closeWalkingStopModal()" class="ios-press w-full bg-ios-blue text-white font-bold text-sm py-3.5 rounded-2xl shadow-lg shadow-blue-500/25">
+          Close Side Panel
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= MODAL 4: FULLSCREEN ROUTE MAP MODAL ================= -->
+    <div id="walkingMapModalBackdrop" class="hidden absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3">
+      <div class="relative max-w-sm w-full bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl border border-zinc-700 flex flex-col max-h-[92%]">
+        <div class="flex items-center justify-between p-3.5 border-b border-zinc-800 text-white">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-map-location-dot text-emerald-400"></i>
+            <span class="text-xs font-bold">Imperial Palace Route Map</span>
+          </div>
+          <button onclick="closeWalkingMapModal()" class="w-7 h-7 rounded-full bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center text-xs">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="overflow-auto p-2 flex-1 flex items-center justify-center bg-black">
+          <img src="imperial_palace_walking_route.jpg" alt="Full Route Map" class="w-full h-auto rounded-xl object-contain" />
+        </div>
+        <div class="p-3 bg-zinc-900 border-t border-zinc-800 text-center">
+          <p class="text-[11px] text-zinc-400">Waypoints 1–5 &amp; 13–14 highlight Tokyo Station, Gates, Castle Ruins &amp; Nijubashi Bridge</p>
+        </div>
+      </div>
+    </div>
+
+
     <!-- ================= MODAL 1: ADD / EDIT ITINERARY ACTIVITY ================= -->
     <div id="activityModalBackdrop" class="hidden absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end">
       <div id="activityModalSheet" class="sheet-enter w-full bg-[#F2F2F7] rounded-t-[32px] p-5 max-h-[86%] overflow-y-auto no-scrollbar shadow-2xl">
@@ -741,7 +983,7 @@
 
   <!-- APPLICATION JAVASCRIPT -->
   <script>
-    const STORAGE_KEY = 'tokyo_family_excel_2026_v2';
+    const STORAGE_KEY = 'tokyo_family_excel_2026_v3';
 
     const CATEGORY_STYLES = {
       Flight: { icon: 'fa-plane-departure', bg: 'bg-sky-100', text: 'text-sky-600', badge: 'bg-sky-50 text-sky-700 border-sky-200' },
@@ -2202,6 +2444,113 @@
       hours = hours % 12 || 12;
       document.getElementById('iosClock').textContent = `${hours}:${mins}`;
     }
+
+    
+    // ================= WALKING ROUTE SIDE PANEL / MODAL CONTROLLERS =================
+    const WALKING_STOPS = {
+      start: {
+        title: "Start: Tokyo Station (Marunouchi Side)",
+        subtitle: "Grand Red-Brick Gateway to the Imperial Palace",
+        tag: "Starting Point",
+        directions: "Exit toward the Marunouchi central side and walk straight down the grand, wide boulevard of Gyoko-dori Avenue.",
+        whatToSee: "The majestic red-brick station building and an open view stretching directly toward the palace.",
+        highlights: [
+          "Iconic 1914 historic red-brick facade designed by Kingo Tatsuno",
+          "Gyoko-dori avenue lined with ginkgo trees with direct symmetrical palace view",
+          "Underground passages connect smoothly to Shin-Marunouchi & Marunouchi buildings"
+        ],
+        tip: "Best photo spot is standing right at the start of Gyoko-dori looking back at the station, then forward to the palace."
+      },
+      stop1: {
+        title: "Stop 1: Kokyo Gaien National Garden & Statue of Kusunoki Masashige",
+        subtitle: "Vast Open Plaza & Feudal Warrior Monument",
+        tag: "Historical Landmark",
+        directions: "At the end of Gyoko-dori, step into the massive open gravel plaza. Bear slightly right to view the striking bronze statue of the samurai warrior Kusunoki Masashige.",
+        whatToSee: "The open expanse of Kokyo Gaien with hundreds of manicured black pine trees (Kuromatsu) and the bronze equestrian statue of Kusunoki Masashige erected in 1900.",
+        highlights: [
+          "Over 2,000 black pines meticulously pruned across white gravel lawns",
+          "Bronze statue of 14th-century samurai Kusunoki Masashige, symbol of royal devotion",
+          "Peaceful wide horizon contrasting Tokyo's ultra-modern Marunouchi skyline"
+        ],
+        tip: "Walking on gravel is easiest along the paved pedestrian walkways flanking the park."
+      },
+      stop2: {
+        title: "Stop 2: Nijubashi Bridge (Seimon-tetsubashi)",
+        subtitle: "The Quintessential Imperial Postcard View",
+        tag: "Iconic Viewpoint",
+        directions: "Walk south-west across the open expanse of the outer gardens toward the inner moat.",
+        whatToSee: "Stand at the viewing area before the double-arched iron bridge and stone ramparts for the definitive Imperial Palace postcard photo.",
+        highlights: [
+          "Seimon Ishibashi (Stone Bridge) in foreground and Nijubashi (Iron Bridge) behind it",
+          "Fushimi-yagura watchtower perched majestically on stone ramparts above the moat",
+          "Calm moat waters creating mirror-like reflections on clear days"
+        ],
+        tip: "This is the most famous photo stop in Tokyo. Morning light illuminates the stone walls and bridge beautifully."
+      },
+      stop3: {
+        title: "Stop 3: Ōte-mon Gate (Otemon)",
+        subtitle: "Former Main Gate of Shogun Edo Castle",
+        tag: "Primary Entrance",
+        directions: "Walk north along the outer perimeter path tracking the east-side moat (or loop back past the station side) to reach the grand Ōte-mon Gate.",
+        whatToSee: "Pass through the heavy security checkpoint and massive defensive stone walls that mark the primary public entrance.",
+        highlights: [
+          "Masugata (box-shaped) defensive gateway designed to trap invading samurai",
+          "Massive cyclopean granite foundation stones assembled without mortar",
+          "Entry checkpoint: pick up your free plastic entry token (return upon exiting)"
+        ],
+        tip: "Admission to the East Gardens is completely FREE. Closed on Mondays and Fridays (or Tuesdays if Monday was a holiday)."
+      },
+      stop4: {
+        title: "Stop 4: Imperial Palace East National Gardens",
+        subtitle: "Ninomaru Garden, Edo Castle Keep & Tenshudai Foundation",
+        tag: "Historic Castle Grounds",
+        directions: "Explore the interior grounds freely. Follow paths leading past the historic Hyakunin Bansho guardhouse, up to the Ninomaru traditional garden, and finally to the elevated stone foundations of the Edo Castle Keep (Tenshudai) for panoramic layout views.",
+        whatToSee: "Historic 100-man guardhouse (Hyakunin Bansho), traditional Ninomaru strolling pond garden with seasonal flowers, and the towering Tenshudai stone base of Edo Castle's former main keep.",
+        highlights: [
+          "Tenshudai (Donjon Keep Base): Climb the gentle ramp to stand on the highest castle vantage point",
+          "Ninomaru Garden: Traditional Japanese garden with koi ponds, maples, and stone lanterns",
+          "Hyakunin Bansho: 50-meter long samurai guardhouse from the Tokugawa Shogunate era"
+        ],
+        tip: "Rest areas, clean restrooms, and beverage vending machines are available near the Ninomaru rest house."
+      }
+    };
+
+    function openWalkingStopModal(stopKey) {
+      const data = WALKING_STOPS[stopKey];
+      if (!data) return;
+      document.getElementById('walkModalTag').textContent = data.tag;
+      document.getElementById('walkModalTitle').textContent = data.title;
+      document.getElementById('walkModalSubtitle').textContent = data.subtitle;
+      document.getElementById('walkModalDirections').textContent = data.directions;
+      document.getElementById('walkModalWhatToSee').textContent = data.whatToSee;
+      document.getElementById('walkModalTip').textContent = data.tip;
+
+      const hlList = document.getElementById('walkModalHighlights');
+      hlList.innerHTML = data.highlights.map(h => '<li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-ios-blue text-xs mt-0.5 shrink-0"></i><span>' + escapeHtml(h) + '</span></li>').join('');
+
+      const backdrop = document.getElementById('walkingModalBackdrop');
+      const sheet = document.getElementById('walkingModalSheet');
+      backdrop.classList.remove('hidden');
+      setTimeout(() => { sheet.classList.add('sheet-active'); }, 10);
+    }
+
+    function closeWalkingStopModal() {
+      const backdrop = document.getElementById('walkingModalBackdrop');
+      const sheet = document.getElementById('walkingModalSheet');
+      sheet.classList.remove('sheet-active');
+      setTimeout(() => { backdrop.classList.add('hidden'); }, 350);
+    }
+
+    function openWalkingMapModal() {
+      const backdrop = document.getElementById('walkingMapModalBackdrop');
+      backdrop.classList.remove('hidden');
+    }
+
+    function closeWalkingMapModal() {
+      const backdrop = document.getElementById('walkingMapModalBackdrop');
+      backdrop.classList.add('hidden');
+    }
+
 
     window.addEventListener('DOMContentLoaded', () => {
       updateIosClock();
