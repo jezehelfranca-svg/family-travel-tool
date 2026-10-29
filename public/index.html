@@ -253,17 +253,20 @@
                 <h3 class="text-sm font-bold text-zinc-900 leading-tight">Step-by-Step Walking Route</h3>
               </div>
             </div>
-            <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">3.5–4 km</span>
+            <a href="https://chatgpt.com/share/6ae354aa-0e80-83ee-ac52-5869ea5331f7" target="_blank" rel="noopener noreferrer" class="text-[10px] font-bold bg-blue-50 text-ios-blue hover:bg-blue-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span>ChatGPT Plan</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </a>
           </div>
 
           <!-- Illustrated Route Map Image with Tap-to-Enlarge -->
           <div class="relative rounded-2xl overflow-hidden border border-zinc-200/80 shadow-inner group cursor-pointer" onclick="openWalkingMapModal()">
             <img src="imperial_palace_walking_route.jpg" alt="Imperial Palace Walking Route Map" class="w-full h-48 object-cover object-center group-hover:scale-105 transition duration-300" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent flex flex-col justify-end p-3 text-white">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent flex flex-col justify-end p-3 text-white">
               <div class="flex items-center justify-between">
                 <div>
-                  <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500 text-white px-2 py-0.5 rounded-md">Route Trail &amp; Waypoints</span>
-                  <p class="text-xs font-black text-white mt-0.5">Tokyo Sta. → Kokyo Gaien → Nijubashi → Ōte-mon → East Gardens</p>
+                  <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500 text-white px-2 py-0.5 rounded-md">Satellite Map &amp; Waypoints 1–14</span>
+                  <p class="text-xs font-black text-white mt-0.5">Tokyo Sta. → Kokyo Gaien → East Gardens → Kitanomaru → Nijubashi</p>
                 </div>
                 <div class="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-xs">
                   <i class="fa-solid fa-expand"></i>
@@ -272,28 +275,39 @@
             </div>
           </div>
 
+          <!-- Interactive Circuit Selector (Standard Circuit A vs Complete Perimeter Loop B) -->
+          <div class="bg-zinc-100 p-1 rounded-xl grid grid-cols-2 gap-1 text-[11px] font-bold">
+            <button id="btnCircuitA" onclick="switchWalkingCircuit('A')" class="py-1.5 rounded-lg bg-white text-zinc-900 shadow-xs transition">
+              Circuit A: East Gardens (3.5 km)
+            </button>
+            <button id="btnCircuitB" onclick="switchWalkingCircuit('B')" class="py-1.5 rounded-lg text-zinc-500 hover:text-zinc-800 transition">
+              Circuit B: Full Perimeter (6.5 km)
+            </button>
+          </div>
+
           <!-- Quick Route Stats Bar -->
-          <div class="grid grid-cols-3 gap-2 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 text-center">
+          <div id="walkingStatsBar" class="grid grid-cols-3 gap-2 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 text-center">
             <div>
               <p class="text-[9px] font-bold text-zinc-400 uppercase">Distance</p>
-              <p class="text-xs font-black text-zinc-800">3.5 – 4.0 km</p>
+              <p id="statWalkDistance" class="text-xs font-black text-zinc-800">3.5 – 4.0 km</p>
             </div>
             <div>
               <p class="text-[9px] font-bold text-zinc-400 uppercase">Est. Time</p>
-              <p class="text-xs font-black text-zinc-800">2 – 3 Hours</p>
+              <p id="statWalkTime" class="text-xs font-black text-zinc-800">2 – 3 Hours</p>
             </div>
             <div>
               <p class="text-[9px] font-bold text-zinc-400 uppercase">Pace</p>
-              <p class="text-xs font-black text-emerald-600">Family Leisure</p>
+              <p id="statWalkPace" class="text-xs font-black text-emerald-600">Family Leisure</p>
             </div>
           </div>
 
-          <p class="text-[11px] text-zinc-600 leading-relaxed">
-            Follow this illustrated historic circuit starting directly from Tokyo Station red-brick central exit through the gravel plaza, imperial moats, defensive castle gates, and historic Ninomaru gardens. Tap any stop below for step-by-step side panel info.
+          <!-- Narrative description -->
+          <p id="walkingRouteDesc" class="text-[11px] text-zinc-600 leading-relaxed">
+            Standard scenic route from Tokyo Station red-brick central exit through Gyoko-dori avenue, Kokyo Gaien outer plaza, Nijubashi Bridge, Ōte-mon Gate, and into the East National Gardens. Tap any stop for full directions &amp; side panel info.
           </p>
 
-          <!-- Interactive Stops List -->
-          <div class="space-y-2 pt-1">
+          <!-- Interactive Stops List (Circuit A) -->
+          <div id="stopsCircuitA" class="space-y-2 pt-1">
             <!-- Start -->
             <div onclick="openWalkingStopModal('start')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-blue-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
               <div class="flex items-start gap-2.5">
@@ -302,14 +316,14 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[9px] font-bold uppercase text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Start</span>
+                    <span class="text-[9px] font-bold uppercase text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Start • W1</span>
                     <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Tokyo Station (Marunouchi Side)</h4>
                   </div>
                   <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Exit toward Marunouchi central side down Gyoko-dori Avenue.</p>
                 </div>
               </div>
               <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
-                <span class="hidden sm:inline">Side Panel</span>
+                <span>Side Panel</span>
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
               </div>
             </div>
@@ -329,7 +343,7 @@
                 </div>
               </div>
               <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
-                <span class="hidden sm:inline">Side Panel</span>
+                <span>Side Panel</span>
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
               </div>
             </div>
@@ -342,14 +356,14 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[9px] font-bold uppercase text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">Stop 2</span>
+                    <span class="text-[9px] font-bold uppercase text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">Stop 2 • W14</span>
                     <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Nijubashi Bridge (Seimon-tetsubashi)</h4>
                   </div>
                   <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Definitive Imperial Palace postcard double-bridge photo view.</p>
                 </div>
               </div>
               <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
-                <span class="hidden sm:inline">Side Panel</span>
+                <span>Side Panel</span>
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
               </div>
             </div>
@@ -362,14 +376,14 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[9px] font-bold uppercase text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">Stop 3</span>
+                    <span class="text-[9px] font-bold uppercase text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">Stop 3 • W2</span>
                     <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Ōte-mon Gate (East Entrance)</h4>
                   </div>
                   <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Heavy security checkpoint and massive defensive stone castle walls.</p>
                 </div>
               </div>
               <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
-                <span class="hidden sm:inline">Side Panel</span>
+                <span>Side Panel</span>
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
               </div>
             </div>
@@ -382,28 +396,147 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[9px] font-bold uppercase text-green-700 bg-green-100 px-1.5 py-0.5 rounded">Stop 4</span>
+                    <span class="text-[9px] font-bold uppercase text-green-700 bg-green-100 px-1.5 py-0.5 rounded">Stop 4 • W3-5</span>
                     <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">East Gardens &amp; Edo Castle Keep</h4>
                   </div>
                   <p class="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">Ninomaru garden, samurai guardhouse &amp; Tenshudai foundation.</p>
                 </div>
               </div>
               <div class="shrink-0 flex items-center gap-1 text-ios-blue text-[11px] font-semibold mt-1">
-                <span class="hidden sm:inline">Side Panel</span>
+                <span>Side Panel</span>
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
               </div>
             </div>
           </div>
 
+          <!-- Interactive Stops List (Circuit B: Full Perimeter Loop) -->
+          <div id="stopsCircuitB" class="hidden space-y-2 pt-1">
+            <!-- Group 1: East Gardens & Castle -->
+            <div class="text-[10px] font-extrabold uppercase tracking-wider text-ios-gray px-1 pt-1">
+              Leg 1: East Gardens &amp; Edo Castle Ruins
+            </div>
+
+            <div onclick="openWalkingStopModal('start')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-blue-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-amber-500 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Tokyo Station (Marunouchi Exit)</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Start point • Walk down Gyoko-dori toward Otemachi.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <div onclick="openWalkingStopModal('stop3')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-purple-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-purple-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Ōte-mon Gate (Otemon)</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Primary public entrance • Free entry token.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <div onclick="openWalkingStopModal('stop4')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-green-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-green-700 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">3-4</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Ninomaru Garden &amp; Tenshudai Keep</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Pond garden, 100-man guardhouse &amp; castle keep ruins.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <div onclick="openWalkingStopModal('ext_kitahane')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-teal-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-teal-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">5</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Kitahanebashi-mon Gate</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Historic drawbridge exit toward Kitanomaru Park.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <!-- Group 2: Northern Parks & Western Moats -->
+            <div class="text-[10px] font-extrabold uppercase tracking-wider text-ios-gray px-1 pt-1.5">
+              Leg 2: Northern Parks &amp; Western Moats
+            </div>
+
+            <div onclick="openWalkingStopModal('ext_kitanomaru')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-emerald-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-emerald-700 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">7-8</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Kitanomaru Park &amp; Tayasu-mon Gate</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Budokan arena, autumn lawns &amp; 1636 castle gate.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <div onclick="openWalkingStopModal('ext_chidorigafuchi')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-sky-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-sky-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">9-10</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Chidorigafuchi Moat &amp; Promenade</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">700m elevated scenic walkway high above western moat.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <div onclick="openWalkingStopModal('ext_hanzomon')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-indigo-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">11</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Hanzō-mon Gate</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Ninja commander Hattori Hanzo gate &amp; long Sakurada moat view.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <!-- Group 3: Southern Palace & Return -->
+            <div class="text-[10px] font-extrabold uppercase tracking-wider text-ios-gray px-1 pt-1.5">
+              Leg 3: Southern Gates &amp; Station Return
+            </div>
+
+            <div onclick="openWalkingStopModal('ext_sakuradamon')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-rose-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-rose-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">13</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Sakurada-mon Gate</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Double defensive gate of 1860 incident &amp; plaza entrance.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+
+            <div onclick="openWalkingStopModal('stop2')" class="ios-press cursor-pointer p-3 rounded-xl bg-zinc-50 hover:bg-blue-50/60 border border-zinc-200/80 transition flex items-start justify-between gap-2.5 group">
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-blue-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">14</span>
+                <div>
+                  <h4 class="text-xs font-bold text-zinc-900 group-hover:text-ios-blue transition">Nijubashi Bridge Viewpoint</h4>
+                  <p class="text-[11px] text-zinc-500 mt-0.5">Seimon Ishibashi &amp; Iron Bridge ceremonial viewing plaza.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-ios-blue mt-1"></i>
+            </div>
+          </div>
+
           <!-- Route Overview & Distance Card -->
           <div class="bg-zinc-50 border border-zinc-200/80 p-3 rounded-xl space-y-1.5 text-xs text-zinc-700">
-            <p class="font-bold text-zinc-900 text-[11px] uppercase tracking-wider text-ios-blue"><i class="fa-solid fa-route mr-1"></i>Route Overview &amp; Distance</p>
-            <p><strong>Total Walking Distance:</strong> Approx. 3.5 to 4 km (2.2 to 2.5 miles) from start to finish.</p>
-            <p><strong>Estimated Time:</strong> 2 to 3 hours, depending on how long you spend exploring the East Gardens.</p>
-            <p><strong>Convenient Finish:</strong> Exit via the northern Kitahanebashi-mon or Kitanomaru Park if you want to extend your walk toward Takebashi Station.</p>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-zinc-900 text-[11px] uppercase tracking-wider text-ios-blue"><i class="fa-solid fa-route mr-1"></i>Route Overview &amp; Distance</span>
+              <a href="https://chatgpt.com/share/6ae354aa-0e80-83ee-ac52-5869ea5331f7" target="_blank" rel="noopener noreferrer" class="text-[10px] text-ios-blue font-semibold hover:underline">View in ChatGPT &rarr;</a>
+            </div>
+            <p id="routeOverviewP1"><strong>Total Walking Distance:</strong> Approx. 3.5 to 4 km (Circuit A) or 6.5 to 7 km (Full Circuit B).</p>
+            <p id="routeOverviewP2"><strong>Estimated Time:</strong> 2 to 3.5 hours depending on East Gardens exploration.</p>
+            <p><strong>Convenient Finish / Transit:</strong> Exit via northern Kitahanebashi-mon toward Takebashi Sta. (Tozai Line) or Kudanshita Sta. (Hanzomon / Shinjuku Lines), or complete the loop back to Tokyo Station.</p>
           </div>
         </div>
-
 
         <!-- FLIGHT DETAILS CARD (Sheet2 Rows 1-3) -->
         <div class="bg-white rounded-2xl p-4 shadow-xs border border-zinc-100 space-y-3.5">
@@ -2446,17 +2579,17 @@
     }
 
     
-    // ================= WALKING ROUTE SIDE PANEL / MODAL CONTROLLERS =================
+    // ================= COMPLETE WALKING ROUTE WAYPOINTS (CHATGPT & SATELLITE MAP) =================
     const WALKING_STOPS = {
       start: {
         title: "Start: Tokyo Station (Marunouchi Side)",
         subtitle: "Grand Red-Brick Gateway to the Imperial Palace",
-        tag: "Starting Point",
-        directions: "Exit toward the Marunouchi central side and walk straight down the grand, wide boulevard of Gyoko-dori Avenue.",
-        whatToSee: "The majestic red-brick station building and an open view stretching directly toward the palace.",
+        tag: "Waypoint 1 • Start & Finish",
+        directions: "Exit Tokyo Station toward the Marunouchi central side and walk straight down the grand, wide boulevard of Gyoko-dori Avenue.",
+        whatToSee: "The majestic 1914 red-brick station building designed by Kingo Tatsuno and an open avenue stretching directly toward the palace.",
         highlights: [
-          "Iconic 1914 historic red-brick facade designed by Kingo Tatsuno",
-          "Gyoko-dori avenue lined with ginkgo trees with direct symmetrical palace view",
+          "Iconic 1914 historic red-brick facade and central imperial entrance",
+          "Gyoko-dori avenue lined with golden ginkgo trees with symmetrical palace view",
           "Underground passages connect smoothly to Shin-Marunouchi & Marunouchi buildings"
         ],
         tip: "Best photo spot is standing right at the start of Gyoko-dori looking back at the station, then forward to the palace."
@@ -2464,7 +2597,7 @@
       stop1: {
         title: "Stop 1: Kokyo Gaien National Garden & Statue of Kusunoki Masashige",
         subtitle: "Vast Open Plaza & Feudal Warrior Monument",
-        tag: "Historical Landmark",
+        tag: "Outer Garden Landmark",
         directions: "At the end of Gyoko-dori, step into the massive open gravel plaza. Bear slightly right to view the striking bronze statue of the samurai warrior Kusunoki Masashige.",
         whatToSee: "The open expanse of Kokyo Gaien with hundreds of manicured black pine trees (Kuromatsu) and the bronze equestrian statue of Kusunoki Masashige erected in 1900.",
         highlights: [
@@ -2477,8 +2610,8 @@
       stop2: {
         title: "Stop 2: Nijubashi Bridge (Seimon-tetsubashi)",
         subtitle: "The Quintessential Imperial Postcard View",
-        tag: "Iconic Viewpoint",
-        directions: "Walk south-west across the open expanse of the outer gardens toward the inner moat.",
+        tag: "Waypoint 14 • Iconic Viewpoint",
+        directions: "Walk south-west across the open expanse of the outer gardens toward the inner moat viewing area.",
         whatToSee: "Stand at the viewing area before the double-arched iron bridge and stone ramparts for the definitive Imperial Palace postcard photo.",
         highlights: [
           "Seimon Ishibashi (Stone Bridge) in foreground and Nijubashi (Iron Bridge) behind it",
@@ -2490,8 +2623,8 @@
       stop3: {
         title: "Stop 3: Ōte-mon Gate (Otemon)",
         subtitle: "Former Main Gate of Shogun Edo Castle",
-        tag: "Primary Entrance",
-        directions: "Walk north along the outer perimeter path tracking the east-side moat (or loop back past the station side) to reach the grand Ōte-mon Gate.",
+        tag: "Waypoint 2 • East Entry Gate",
+        directions: "Walk north along the outer perimeter path tracking the east-side moat to reach the grand Ōte-mon Gate.",
         whatToSee: "Pass through the heavy security checkpoint and massive defensive stone walls that mark the primary public entrance.",
         highlights: [
           "Masugata (box-shaped) defensive gateway designed to trap invading samurai",
@@ -2501,10 +2634,10 @@
         tip: "Admission to the East Gardens is completely FREE. Closed on Mondays and Fridays (or Tuesdays if Monday was a holiday)."
       },
       stop4: {
-        title: "Stop 4: Imperial Palace East National Gardens",
-        subtitle: "Ninomaru Garden, Edo Castle Keep & Tenshudai Foundation",
-        tag: "Historic Castle Grounds",
-        directions: "Explore the interior grounds freely. Follow paths leading past the historic Hyakunin Bansho guardhouse, up to the Ninomaru traditional garden, and finally to the elevated stone foundations of the Edo Castle Keep (Tenshudai) for panoramic layout views.",
+        title: "Stop 4: Imperial Palace East National Gardens & Ninomaru Garden",
+        subtitle: "Ninomaru Garden, Honmaru & Edo Castle Keep",
+        tag: "Waypoints 3, 4 & 5",
+        directions: "Explore the interior grounds freely. Follow paths past the historic Hyakunin Bansho guardhouse, up to the Ninomaru traditional pond garden, and to the elevated stone foundations of the Edo Castle Keep (Tenshudai).",
         whatToSee: "Historic 100-man guardhouse (Hyakunin Bansho), traditional Ninomaru strolling pond garden with seasonal flowers, and the towering Tenshudai stone base of Edo Castle's former main keep.",
         highlights: [
           "Tenshudai (Donjon Keep Base): Climb the gentle ramp to stand on the highest castle vantage point",
@@ -2512,8 +2645,104 @@
           "Hyakunin Bansho: 50-meter long samurai guardhouse from the Tokugawa Shogunate era"
         ],
         tip: "Rest areas, clean restrooms, and beverage vending machines are available near the Ninomaru rest house."
+      },
+      ext_kitahane: {
+        title: "Extended Stop 5: Kitahanebashi-mon Gate",
+        subtitle: "Northern Exit to Kitanomaru Park",
+        tag: "Waypoint 5 • Castle North Gate",
+        directions: "From the Tenshudai castle keep foundation, walk north down the ramp to exit the East Gardens via the historic Kitahanebashi (North Drawbridge) Gate.",
+        whatToSee: "The former northern defensive drawbridge over the deepest inner moat segment with towering stone bastions.",
+        highlights: [
+          "Historical drawbridge site bridging the Honmaru and Kitanomaru defense rings",
+          "Direct exit to Takebashi Station (Tozai Line) or into Kitanomaru Park",
+          "Look back for an imposing view of the Tenshudai foundation"
+        ],
+        tip: "Return your plastic garden token at the guard kiosk as you pass through."
+      },
+      ext_kitanomaru: {
+        title: "Extended Stop 6: Kitanomaru Park & Tayasu-mon Gate",
+        subtitle: "Lush Moat-Surrounded Park & Oldest Surviving Edo Gate",
+        tag: "Waypoints 7 & 8 • North Perimeter",
+        directions: "Cross the street from Kitahanebashi-mon into Kitanomaru Park. Stroll past the pond and Nippon Budokan arena, exiting through Tayasu-mon Gate toward Kudanshita.",
+        whatToSee: "Spacious green park, the National Museum of Modern Art Crafts Gallery, Nippon Budokan martial arts hall, and the imposing 1636 Tayasu-mon Gate.",
+        highlights: [
+          "Tayasu-mon Gate (1636): Designated Important Cultural Property, the oldest surviving castle gate",
+          "Nippon Budokan: Famous octagonal martial arts arena and historic concert venue",
+          "Tree-lined park paths with tranquil autumn foliage"
+        ],
+        tip: "Public restrooms and shaded benches make this an ideal rest stop before the western moat."
+      },
+      ext_chidorigafuchi: {
+        title: "Extended Stop 7: Chidorigafuchi Moat & Promenade",
+        subtitle: "Spectacular Western Moat & Green Walking Path",
+        tag: "Waypoints 9 & 10 • Western Promenade",
+        directions: "From Tayasu-mon, follow the curved path along Chidorigafuchi green path south toward Hanzomon Station.",
+        whatToSee: "700-meter scenic tree-lined moat promenade high above the deep moat waters, renowned for sweeping greenery and reflections.",
+        highlights: [
+          "Deepest moat in the entire palace system with lush sloping embankments",
+          "Dedicated pedestrian promenade separated from traffic",
+          "Spectacular sunset viewpoints across the water toward the palace woods"
+        ],
+        tip: "Very flat and breezy walk; perfect for an afternoon stroll."
+      },
+      ext_hanzomon: {
+        title: "Extended Stop 8: Hanzō-mon Gate & South Moat",
+        subtitle: "Rear Castle Escape Gate Named After Ninja Hattori Hanzo",
+        tag: "Waypoint 11 • Western Gate",
+        directions: "Continue south along the western perimeter to reach Hanzō-mon Gate at the intersection of Uchibori-dori and Shinjuku-dori.",
+        whatToSee: "The heavily guarded western entrance used today by the Imperial Family, overlooking the Sakurada Moat.",
+        highlights: [
+          "Named after Tokugawa Ieyasu's legendary ninja commander Hattori Hanzo",
+          "Panoramic view south down the long, straight Sakuradabori moat",
+          "Direct access to Tokyo Metro Hanzomon Station if pausing the walk"
+        ],
+        tip: "Public entry is strictly prohibited through this gate; enjoy the dramatic moat perspective from the walkway."
+      },
+      ext_sakuradamon: {
+        title: "Extended Stop 9: Sakurada-mon Gate (Outer Sakurada Gate)",
+        subtitle: "Site of Historic 1860 Incident & National Cultural Property",
+        tag: "Waypoint 13 • Southern Entrance",
+        directions: "Follow the gentle downhill walkway along Sakuradabori moat to the monumental double gate of Sakurada-mon.",
+        whatToSee: "Massive double-gate complex (Korai-mon & Yagura-mon) leading directly back into Kokyo Gaien outer plaza.",
+        highlights: [
+          "Site of the famous 1860 Sakuradamon Incident that triggered the Meiji Restoration",
+          "Largest remaining gateway structure of Edo Castle with massive iron-studded timber doors",
+          "Frames the view toward the National Diet Building and Kasumigaseki government quarter"
+        ],
+        tip: "Walking through the inner gate opens up a panoramic view of the wide Tokyo Station skyline."
       }
     };
+
+    function switchWalkingCircuit(mode) {
+      const btnA = document.getElementById('btnCircuitA');
+      const btnB = document.getElementById('btnCircuitB');
+      const stopsA = document.getElementById('stopsCircuitA');
+      const stopsB = document.getElementById('stopsCircuitB');
+      const dist = document.getElementById('statWalkDistance');
+      const time = document.getElementById('statWalkTime');
+      const pace = document.getElementById('statWalkPace');
+      const desc = document.getElementById('walkingRouteDesc');
+
+      if (mode === 'A') {
+        btnA.className = 'py-1.5 rounded-lg bg-white text-zinc-900 shadow-xs transition';
+        btnB.className = 'py-1.5 rounded-lg text-zinc-500 hover:text-zinc-800 transition';
+        stopsA.classList.remove('hidden');
+        stopsB.classList.add('hidden');
+        dist.textContent = '3.5 – 4.0 km';
+        time.textContent = '2 – 3 Hours';
+        pace.textContent = 'Family Leisure';
+        desc.textContent = 'Standard scenic route from Tokyo Station red-brick central exit through Gyoko-dori avenue, Kokyo Gaien outer plaza, Nijubashi Bridge, Ōte-mon Gate, and into the East National Gardens. Tap any stop for full directions & side panel info.';
+      } else {
+        btnB.className = 'py-1.5 rounded-lg bg-white text-zinc-900 shadow-xs transition';
+        btnA.className = 'py-1.5 rounded-lg text-zinc-500 hover:text-zinc-800 transition';
+        stopsB.classList.remove('hidden');
+        stopsA.classList.add('hidden');
+        dist.textContent = '6.5 – 7.0 km';
+        time.textContent = '3.5 – 5 Hours';
+        pace.textContent = 'Full Walking Loop';
+        desc.textContent = 'Extended complete perimeter circuit following the satellite map trail: Tokyo Station → East Gardens & Tenshudai → Kitahanebashi-mon → Kitanomaru Park → Chidorigafuchi Promenade → Hanzomon → Sakuradamon → Nijubashi → Tokyo Station.';
+      }
+    }
 
     function openWalkingStopModal(stopKey) {
       const data = WALKING_STOPS[stopKey];
